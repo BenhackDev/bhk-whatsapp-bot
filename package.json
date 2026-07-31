@@ -1,0 +1,57 @@
+{
+  "name": "bhk-bot",
+  "version": "1.0.0",
+  "description": "ðŸ¤– BHK WhatsApp Bot â€” Bot de WhatsApp profesional con IA (Gemini), generaciÃ³n de imÃ¡genes, descarga de TikTok, texto a voz y mÃ¡s. Node.js + whatsapp-web.js",
+  "main": "bhk-bot.js",
+  "scripts": {
+    "start": "node bhk-bot.js",
+    "dev": "node bhk-bot.js",
+    "check": "node scripts/check-syntax.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "whatsapp-bot",
+    "whatsapp-web",
+    "whatsapp-web.js",
+    "gemini",
+    "gemini-ai",
+    "ai",
+    "ia",
+    "chatbot",
+    "nodejs",
+    "tiktok-downloader",
+    "text-to-speech",
+    "automation",
+    "whatsapp-automation",
+    "open-source"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Tutos Benhack",
+    "url": "https://www.youtube.com/@Tutos_benhack"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ben202gervacio-eng/bhk-whatsapp-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ben202gervacio-eng/bhk-whatsapp-bot/issues"
+  },
+  "homepage": "https://github.com/ben202gervacio-eng/bhk-whatsapp-bot#readme",
+  "funding": {
+    "type": "other",
+    "url": "https://www.youtube.com/@Tutos_benhack"
+  },
+  "dependencies": {
+    "@google/genai": "^1.8.1",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "mysql2": "^3.12.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  }
+}

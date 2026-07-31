@@ -1,0 +1,59 @@
+name: 💡 Solicitar una función
+description: Propón una nueva idea o mejora para BHK WhatsApp Bot
+title: "[FEATURE] "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por proponer una mejora. 💚 Antes de abrir:
+        - Revisa el [ROADMAP](../../ROADMAP.md) (tu idea puede estar planificada)
+        - Busca si ya existe un issue similar
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: ¿Qué problema resuelve esta función?
+      description: Explica el contexto y el "por qué" de la propuesta
+      placeholder: "Ej: no hay forma de saber cuántos usuarios usan cada comando..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solucion
+    attributes:
+      label: Comportamiento esperado
+      description: Describe cómo funcionaría la función
+      placeholder: "Ej: un comando `.stats` que muestre los comandos más usados..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: ejemplos
+    attributes:
+      label: Ejemplos de uso
+      description: Ejemplos concretos con formato de comando
+      placeholder: |
+        `.stats`
+        ➜ Comandos más usados esta semana:
+        1. .ia — 45 usos
+        2. .tiktok — 30 usos
+
+  - type: dropdown
+    id: prioridad
+    attributes:
+      label: Prioridad sugerida
+      options:
+        - Baja (nice to have)
+        - Media (mejora útil)
+        - Alta (me faltaría para mi uso)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribucion
+    attributes:
+      label: ¿Quieres implementarlo tú?
+      options:
+        - label: "Sí, me gustaría implementar esta función yo mismo"
+        - label: "No, solo lo propongo"

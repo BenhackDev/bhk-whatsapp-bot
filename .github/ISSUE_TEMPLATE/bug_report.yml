@@ -1,0 +1,74 @@
+name: 🐛 Reportar un bug
+description: Reporta un error para ayudarnos a mejorar BHK WhatsApp Bot
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar este bug. Completa la información para poder resolverlo rápido. 🚀
+        > ⚠️ Si el problema es de **seguridad**, NO uses este formulario: consulta [SECURITY.md](../../SECURITY.md).
+
+  - type: dropdown
+    id: sistema
+    attributes:
+      label: Sistema operativo
+      description: ¿Dónde estás ejecutando el bot?
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Termux (Android)
+        - VPS/Server
+        - Otro
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Versión de Node.js
+      description: Salida de `node --version`
+      placeholder: "v22.17.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción del problema
+      description: ¿Qué ocurrió? ¿Qué esperabas que pasara?
+      placeholder: Describe el bug de forma clara y concisa...
+    validations:
+      required: true
+
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducir
+      description: Pasos exactos para reproducir el error
+      placeholder: |
+        1. Ejecuto `npm start`
+        2. Envío el comando `.tiktok https://vm.tiktok.com/...`
+        3. El bot responde con error...
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: errores
+    attributes:
+      label: Mensaje de error (log de consola)
+      description: Copia el log completo del error. Si contiene datos sensibles (números, claves), edítalos.
+      placeholder: "[ERROR TIKTOK] ..."
+      render: shell
+
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto adicional
+      description: Capturas de pantalla, configuraciones relevantes, modificaciones al código, etc.
+      placeholder: Capturas, cambios realizados, versión del proyecto...
