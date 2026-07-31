@@ -1,7 +1,7 @@
 {
   "name": "bhk-bot",
   "version": "1.0.0",
-  "description": "ðŸ¤– BHK WhatsApp Bot â€” Bot de WhatsApp profesional con IA (Gemini), generaciÃ³n de imÃ¡genes, descarga de TikTok, texto a voz y mÃ¡s. Node.js + whatsapp-web.js",
+  "description": "🤖 BHK WhatsApp Bot — Bot de WhatsApp profesional con IA (Gemini), generación de imágenes, descarga de TikTok, texto a voz y más. Node.js + whatsapp-web.js",
   "main": "bhk-bot.js",
   "scripts": {
     "start": "node bhk-bot.js",

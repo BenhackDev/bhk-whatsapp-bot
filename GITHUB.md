@@ -1,14 +1,14 @@
-# ðŸ™ GuÃ­a de Git y GitHub â€” BHK WhatsApp Bot
+# 🐙 Guía de Git y GitHub — BHK WhatsApp Bot
 
 Todo lo que necesitas para usar **Git** y **GitHub** con este proyecto, desde cero.
 
-> ðŸ†• Â¿Primera vez? Empieza por [IntroducciÃ³n a Git](#-introducciÃ³n-a-git).
+> 🆕 ¿Primera vez? Empieza por [Introducción a Git](#-introducción-a-git).
 
 ---
 
-## ðŸ“‹ Ãndice
+## 📋 Índice
 
-- [IntroducciÃ³n a Git](#-introducciÃ³n-a-git)
+- [Introducción a Git](#-introducción-a-git)
 - [Inicializar el repositorio](#-inicializar-el-repositorio)
 - [Comandos esenciales](#-comandos-esenciales)
   - [`git status`](#git-status)
@@ -25,57 +25,57 @@ Todo lo que necesitas para usar **Git** y **GitHub** con este proyecto, desde ce
   - [`git checkout`](#git-checkout)
 - [Fusionar cambios](#-fusionar-cambios-merge)
 - [Tags y Releases](#-tags-y-releases)
-- [ConfiguraciÃ³n del repositorio en GitHub](#-configuraciÃ³n-del-repositorio-en-github)
+- [Configuración del repositorio en GitHub](#-configuración-del-repositorio-en-github)
 
 ---
 
-## ðŸ§  IntroducciÃ³n a Git
+## 🧠 Introducción a Git
 
-**Git** es un sistema de control de versiones: guarda un historial de todos los cambios de tu cÃ³digo. **GitHub** es una plataforma para alojar repositorios Git y colaborar.
+**Git** es un sistema de control de versiones: guarda un historial de todos los cambios de tu código. **GitHub** es una plataforma para alojar repositorios Git y colaborar.
 
 ```
 Local (tu PC)                    GitHub (remoto)
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    push     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  working dir     â”‚ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º â”‚  github.com/USUARIO/ â”‚
-â”‚  â†’ git add       â”‚             â”‚  bhk-whatsapp-bot    â”‚
-â”‚  â†’ commit        â”‚ â—„â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ â”‚                      â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    pull     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌──────────────────┐    push     ┌──────────────────────┐
+│  working dir     │ ──────────► │  github.com/USUARIO/ │
+│  → git add       │             │  bhk-whatsapp-bot    │
+│  → commit        │ ◄────────── │                      │
+└──────────────────┘    pull     └──────────────────────┘
 ```
 
 ---
 
-## ðŸš€ Inicializar el repositorio
+## 🚀 Inicializar el repositorio
 
-**Si clonaste el proyecto** (recomendado): ya estÃ¡ inicializado, salta a la [ConfiguraciÃ³n de GitHub](#-configuraciÃ³n-del-repositorio-en-github).
+**Si clonaste el proyecto** (recomendado): ya está inicializado, salta a la [Configuración de GitHub](#-configuración-del-repositorio-en-github).
 
 **Si tienes el proyecto en local sin Git:**
 
 ```bash
 git init                       # crea el repositorio en la carpeta actual
-git status                     # verifica que .env y session/ NO aparezcan (estÃ¡n ignorados)
+git status                     # verifica que .env y session/ NO aparezcan (están ignorados)
 git add .
 git commit -m "chore: inicializa el repositorio con el bot base"
 ```
 
 ---
 
-## ðŸ› ï¸ Comandos esenciales
+## 🛠️ Comandos esenciales
 
 ### `git status`
-Muestra quÃ© archivos cambiaron, cuÃ¡les estÃ¡n listos para commitear y cuÃ¡les son nuevos.
+Muestra qué archivos cambiaron, cuáles están listos para commitear y cuáles son nuevos.
 
 ```bash
 git status
 ```
 
-> âœ… **Siempre verifica antes de commitear** que `.env`, `session/` y `temp/` NO aparezcan. Si aparecen, estÃ¡n en `.gitignore` de forma incompleta.
+> ✅ **Siempre verifica antes de commitear** que `.env`, `session/` y `temp/` NO aparezcan. Si aparecen, están en `.gitignore` de forma incompleta.
 
 ### `git add`
-AÃ±ade archivos al Ã¡rea de preparaciÃ³n (staging).
+Añade archivos al área de preparación (staging).
 
 ```bash
 git add .                          # todos los cambios
-git add src/commands/menu.js       # un archivo especÃ­fico
+git add src/commands/menu.js       # un archivo específico
 git add src/commands/ src/config/  # una carpeta
 ```
 
@@ -83,7 +83,7 @@ git add src/commands/ src/config/  # una carpeta
 Guarda un "snapshot" con mensaje descriptivo (usamos [Conventional Commits](CONTRIBUTING.md#-hacer-commits)):
 
 ```bash
-git commit -m "feat(comandos): aÃ±ade comando .sticker"
+git commit -m "feat(comandos): añade comando .sticker"
 ```
 
 ### `git log`
@@ -91,13 +91,13 @@ Historial de commits:
 
 ```bash
 git log                    # historial completo
-git log --oneline          # resumido (1 lÃ­nea por commit)
-git log --oneline -10      # Ãºltimos 10
+git log --oneline          # resumido (1 línea por commit)
+git log --oneline -10      # últimos 10
 ```
 
 ---
 
-## ðŸŒ Trabajar con GitHub
+## 🌍 Trabajar con GitHub
 
 ### `git clone`
 Copia un repositorio remoto a tu PC:
@@ -117,14 +117,14 @@ git remote set-url origin https://github.com/ben202gervacio-eng/bhk-whatsapp-bot
 git remote remove origin                        # desconectar
 ```
 
-> ðŸ”— Usa la URL **HTTPS** (simple) o **SSH** (`git@github.com:USUARIO/...`, requiere claves SSH configuradas).
+> 🔗 Usa la URL **HTTPS** (simple) o **SSH** (`git@github.com:USUARIO/...`, requiere claves SSH configuradas).
 
 ### `git push`
 Sube tus commits al remoto:
 
 ```bash
 git push origin main            # primera vez
-git push                        # siguientes veces (ya estÃ¡ configurado)
+git push                        # siguientes veces (ya está configurado)
 ```
 
 ### `git pull`
@@ -136,9 +136,9 @@ git pull origin main
 
 ---
 
-## ðŸŒ¿ Ramas
+## 🌿 Ramas
 
-Las ramas permiten trabajar en paralelo sin romper la versiÃ³n estable (`main`).
+Las ramas permiten trabajar en paralelo sin romper la versión estable (`main`).
 
 ### `git branch`
 ```bash
@@ -165,61 +165,61 @@ git push origin feature/mi-comando   # abre Pull Request en GitHub
 
 ---
 
-## ðŸ”€ Fusionar cambios (merge)
+## 🔀 Fusionar cambios (merge)
 
 Lleva los cambios de una rama a otra:
 
 ```bash
-git checkout main                 # pÃ¡sate a main
+git checkout main                 # pásate a main
 git pull origin main              # actualiza main
 git merge feature/mi-comando      # fusiona tu rama
 git push origin main
 ```
 
-> ðŸ’¡ Para proyectos colaborativos se prefiere **Pull Request** (revisiÃ³n previa en GitHub) antes que merge directo.
+> 💡 Para proyectos colaborativos se prefiere **Pull Request** (revisión previa en GitHub) antes que merge directo.
 
 ---
 
-## ðŸ·ï¸ Tags y Releases
+## 🏷️ Tags y Releases
 
 Los **tags** marcan versiones en el historial; los **Releases** las publican en GitHub con notas.
 
 ```bash
 git tag v1.1.0                    # crea el tag
-git push origin v1.1.0            # sÃºbelo a GitHub
+git push origin v1.1.0            # súbelo a GitHub
 ```
 
-Ver tags: `git tag` Â· Borrar tag: `git tag -d v1.1.0` y `git push origin :v1.1.0`
+Ver tags: `git tag` · Borrar tag: `git tag -d v1.1.0` y `git push origin :v1.1.0`
 
-**Crear Release desde GitHub (fÃ¡cil):**
-1. Ve al repositorio â†’ pestaÃ±a **Releases**
-2. **Create a new release** â†’ elige el tag (o crea uno nuevo)
-3. Escribe el tÃ­tulo (`v1.1.0`) y las notas (copia de [CHANGELOG.md](CHANGELOG.md))
+**Crear Release desde GitHub (fácil):**
+1. Ve al repositorio → pestaña **Releases**
+2. **Create a new release** → elige el tag (o crea uno nuevo)
+3. Escribe el título (`v1.1.0`) y las notas (copia de [CHANGELOG.md](CHANGELOG.md))
 4. Publicar
 
-> ðŸ“¦ Sigue la guÃ­a de [SemVer](https://semver.org/lang/es/): vMAYOR.MENOR.PATCH.
+> 📦 Sigue la guía de [SemVer](https://semver.org/lang/es/): vMAYOR.MENOR.PATCH.
 
 ---
 
-## âš™ï¸ ConfiguraciÃ³n del repositorio en GitHub
+## ⚙️ Configuración del repositorio en GitHub
 
 Para que el repositorio luzca profesional (configura en *Settings* y *Code*):
 
-### Topics y descripciÃ³n
-En la pÃ¡gina principal del repo â†’ rueda âš™ï¸ (Settings del repo):
+### Topics y descripción
+En la página principal del repo → rueda ⚙️ (Settings del repo):
 
 **Description:**
 ```
-ðŸ¤– Bot de WhatsApp con IA (Gemini), imÃ¡genes, TikTok, texto a voz y mÃ¡s â€” Node.js + whatsapp-web.js. Open Source.
+🤖 Bot de WhatsApp con IA (Gemini), imágenes, TikTok, texto a voz y más — Node.js + whatsapp-web.js. Open Source.
 ```
 
 **Topics:**
 ```
-whatsapp-bot Â· nodejs Â· gemini Â· whatsapp-web Â· javascript Â· chatgpt-alternative Â· ai-bot Â· whatsapp-automation Â· tiktok-downloader Â· text-to-speech Â· open-source Â· bot
+whatsapp-bot · nodejs · gemini · whatsapp-web · javascript · chatgpt-alternative · ai-bot · whatsapp-automation · tiktok-downloader · text-to-speech · open-source · bot
 ```
 
 ### Badges
-El README ya incluye badges estÃ¡ticos. Al publicar el repo puedes aÃ±adir los automÃ¡ticos:
+El README ya incluye badges estáticos. Al publicar el repo puedes añadir los automáticos:
 
 ```markdown
 [![Stars](https://img.shields.io/github/stars/ben202gervacio-eng/bhk-whatsapp-bot?style=for-the-badge)]
@@ -228,35 +228,35 @@ El README ya incluye badges estÃ¡ticos. Al publicar el repo puedes aÃ±adir l
 ```
 
 ### Releases
-- Publica cada versiÃ³n con sus notas (ver [Tags y Releases](#-tags-y-releases))
+- Publica cada versión con sus notas (ver [Tags y Releases](#-tags-y-releases))
 - Vincula el release con el milestone correspondiente
 
 ### Issues y Labels
-- Crea labels: `bug`, `feature`, `documentaciÃ³n`, `buena-primera-issue`, `help wanted`, `duplicado`, `pregunta`
+- Crea labels: `bug`, `feature`, `documentación`, `buena-primera-issue`, `help wanted`, `duplicado`, `pregunta`
 - Activa el **template de issues** (ya incluido en `.github/ISSUE_TEMPLATE/`)
 
 ### Discussions (opcional)
-*Settings â†’ General â†’ Features â†’ Discussions*: activa un espacio de preguntas y comunidad.
+*Settings → General → Features → Discussions*: activa un espacio de preguntas y comunidad.
 
 ### Projects y Milestones (opcional)
 - **Projects:** tablero Kanban (TODO / En curso / Hecho) para planificar
-- **Milestones:** agrupa issues por versiÃ³n (v1.1.0, v1.2.0...)
+- **Milestones:** agrupa issues por versión (v1.1.0, v1.2.0...)
 
 ### GitHub Actions
-El repositorio incluye un workflow de CI (`npm run check`). ActÃ­valo: *Actions* â†’ debe aparecer automÃ¡ticamente al primer push.
+El repositorio incluye un workflow de CI (`npm run check`). Actívalo: *Actions* → debe aparecer automáticamente al primer push.
 
 ### Ramas protegidas (recomendado)
-*Settings â†’ Branches â†’ Add rule:*
+*Settings → Branches → Add rule:*
 - Rama: `main`
-- âœ“ Require pull request reviews before merging
-- âœ“ Require status checks (CI pasa antes de fusionar)
+- ✓ Require pull request reviews before merging
+- ✓ Require status checks (CI pasa antes de fusionar)
 
 ---
 
-## ðŸ§  Resumen rÃ¡pido
+## 🧠 Resumen rápido
 
 ```bash
-git status                              # Â¿quÃ© cambiÃ³?
+git status                              # ¿qué cambió?
 git add .                               # preparar cambios
 git commit -m "feat: mensaje"           # guardar cambios
 git pull origin main                    # actualizar
@@ -264,7 +264,7 @@ git push origin main                    # subir
 git checkout -b feature/x               # nueva rama
 git merge feature/x                     # fusionar
 git log --oneline                       # historial
-git tag v1.1.0 && git push origin v1.1.0  # marcar versiÃ³n
+git tag v1.1.0 && git push origin v1.1.0  # marcar versión
 ```
 
-Â¿Dudas? El [canal de YouTube](https://www.youtube.com/@Tutos_benhack) tiene la serie completa. Â¡Nos vemos en la comunidad! ðŸ’š
+¿Dudas? El [canal de YouTube](https://www.youtube.com/@Tutos_benhack) tiene la serie completa. ¡Nos vemos en la comunidad! 💚

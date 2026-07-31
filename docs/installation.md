@@ -1,11 +1,11 @@
-# ðŸ“¥ InstalaciÃ³n
+# 📥 Instalación
 
-GuÃ­as de instalaciÃ³n completas:
+Guías de instalación completas:
 
-- [**INSTALL.md**](../INSTALL.md) â€” Windows, Linux, macOS y Termux (guÃ­a principal)
-- [**TERMUX.md**](../TERMUX.md) â€” InstalaciÃ³n paso a paso en Android (Termux)
+- [**INSTALL.md**](../INSTALL.md) — Windows, Linux, macOS y Termux (guía principal)
+- [**TERMUX.md**](../TERMUX.md) — Instalación paso a paso en Android (Termux)
 
-## Resumen rÃ¡pido
+## Resumen rápido
 
 ```bash
 # 1. Clonar
@@ -26,10 +26,10 @@ npm start              # escanea el QR con tu WhatsApp
 
 | Requisito | Necesario para |
 |---|---|
-| Node.js â‰¥ 18 | Todo |
-| Google Chrome | ConexiÃ³n a WhatsApp Web |
+| Node.js ≥ 18 | Todo |
+| Google Chrome | Conexión a WhatsApp Web |
 | ffmpeg | Comando `.voz` |
 | yt-dlp | Comandos `.tiktok` / `.tk` |
-| MySQL | Opcional (estadÃ­sticas y usuarios) |
+| MySQL | Opcional (estadísticas y usuarios) |
 
-> ðŸš¨ **IMPORTANTE:** `session/`, `temp/` y `.env` estÃ¡n en `.gitignore`. Nunca los subas a GitHub.
+> 🚨 **IMPORTANTE:** `session/`, `temp/` y `.env` están en `.gitignore`. Nunca los subas a GitHub.

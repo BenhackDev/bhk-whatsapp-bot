@@ -1,8 +1,8 @@
-# ðŸ“± Termux (Android)
+# 📱 Termux (Android)
 
-GuÃ­a completa para instalar el bot en **Termux** (Android).
+Guía completa para instalar el bot en **Termux** (Android).
 
-> ðŸ“– **GuÃ­a definitiva y detallada: [TERMUX.md](../TERMUX.md)** â€” no te la saltes, incluye pasos Ãºnicos para Android.
+> 📖 **Guía definitiva y detallada: [TERMUX.md](../TERMUX.md)** — no te la saltes, incluye pasos únicos para Android.
 
 ## Resumen
 
@@ -28,17 +28,17 @@ npm start            # escanea el QR
 ## Puntos clave
 
 - **Termux desde F-Droid**, no de Play Store
-- **Chromium es obligatorio** (`pkg install -y chromium`) â€” es el navegador para WhatsApp Web
+- **Chromium es obligatorio** (`pkg install -y chromium`) — es el navegador para WhatsApp Web
 - **Mantener el proceso vivo:** `tmux` o `nohup` (Android mata procesos en segundo plano)
 - **Actualizar:** `git pull origin main && npm install`
-- **Borrar sesiÃ³n:** `rm -rf session/*` y vuelve a escanear
+- **Borrar sesión:** `rm -rf session/*` y vuelve a escanear
 
 ## Errores comunes en Termux
 
-| Error | SoluciÃ³n |
+| Error | Solución |
 |---|---|
 | `chromium: command not found` | `pkg install -y chromium` |
 | `spawn chromium ENOENT` | Reinstala chromium y reinicia el bot |
-| QR cortado en pantalla | Rota el telÃ©fono a horizontal |
-| El bot muere al bloquear pantalla | Usa `tmux`: `tmux new -s bot` â†’ `npm start` â†’ `Ctrl+B` + `D` |
+| QR cortado en pantalla | Rota el teléfono a horizontal |
+| El bot muere al bloquear pantalla | Usa `tmux`: `tmux new -s bot` → `npm start` → `Ctrl+B` + `D` |
 | `ffmpeg: not found` | `pkg install -y ffmpeg` |
