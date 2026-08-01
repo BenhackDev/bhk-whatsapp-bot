@@ -111,6 +111,37 @@ Guarda con `Ctrl + O`, `Enter`, y sal con `Ctrl + X`.
 
 > 💡 Sin `GEMINI_API_KEY` el bot funciona, pero `.ia`, `.img` e `.img-ia` no responden.
 
+### Base de datos MySQL (opcional)
+
+El bot registra los **usuarios** y el **uso de comandos** en MySQL. Esos datos son sensibles (IDs y aliases de las personas que te escriben), así que no conviene tener la base solo en el teléfono.
+
+Crea las tablas con el esquema incluido en el proyecto:
+
+```bash
+pkg install -y mariadb                # solo si quieres MySQL local en Termux
+mysql -u root -p < schema.sql
+```
+
+**Opciones, de más a menos recomendada:**
+
+1. **MySQL en tu PC o VPS** — la DB vive en un equipo que no se pierde. Para no exponerla a internet, conéctate desde Termux con un túnel SSH:
+   ```bash
+   ssh -L 3306:localhost:3306 usuario@IP-DE-TU-PC
+   ```
+   y deja `DB_HOST=127.0.0.1` en `.env`.
+2. **MySQL en la nube** — planes gratis: **Aiven** (backups automáticos) o **TiDB Cloud Serverless** (compatible con MySQL, 5 GB gratis). En `.env`: `DB_HOST=...`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`.
+3. **MariaDB local en Termux** — funciona sin internet, pero ⚠️ si pierdes o te roban el teléfono, pierdes los datos. Úsala solo para pruebas.
+
+**Regla de oro:** contraseña larga y aleatoria (nunca `root` sin contraseña), `.env` jamás se sube a GitHub (ya está en `.gitignore`) y nunca expongas el puerto `3306` directo a internet.
+
+**Backups** (guárdalos fuera del teléfono):
+
+```bash
+mysqldump -u root -p bhk_bot > bhk_bot_$(date +%F).sql
+```
+
+> Si MySQL no está disponible, el bot arranca igual y avisa `[DB] Continuando sin base de datos...` (solo se desactiva el registro).
+
 ## 9. Ejecutar el bot
 
 ```bash
@@ -192,6 +223,7 @@ npm start
 | Error | Causa | Solución |
 |---|---|---|
 | `ECONNREFUSED` o errores de red | Sin conexión estable | Repite `pkg install` / `npm install` |
+| `[DB] Error al inicializar: connect ECONNREFUSED 127.0.0.1:3306` | MySQL no está corriendo o credenciales mal | Arranca MySQL (`mysqld_safe &`) o revisa las variables `DB_*` del `.env` (sección 8) |
 | Pantalla del QR se ve cortada | Terminal pequeña | Rota el teléfono a horizontal o reduce el tamaño de letra |
 | `Termux` se cierra al instalar | Memoria insuficiente | Cierra apps en segundo plano |
 | El bot responde `El paquete está corrompido` | npm cache | `npm cache clean --force && npm install` |

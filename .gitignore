@@ -15,9 +15,6 @@ session/
 temp/
 *.tmp
 
-# ===== Caché de Puppeteer =====
-.wwebjs_cache/
-
 # ===== Logs =====
 *.log
 logs/
