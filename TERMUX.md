@@ -174,6 +174,19 @@ npm install
 npm start
 ```
 
+**Si tras actualizar el bot sigue iniciando con la versión vieja** (errores de Chrome/Chromium o `whatsapp-web.js`), fuerza la actualización con limpieza total:
+
+```bash
+cd ~/bhk-whatsapp-bot
+git reset --hard origin/main
+rm -rf node_modules package-lock.json
+npm install
+node -e "console.log(require('./package.json').version)"   # debe imprimir 1.1.0
+npm start
+```
+
+> `git reset --hard` sobrescribe tus archivos locales con la versión de GitHub. Tu `.env` no se borra: está en `.gitignore`.
+
 ## 12. Solución de errores
 
 | Error | Causa | Solución |
@@ -183,8 +196,10 @@ npm start
 | `Termux` se cierra al instalar | Memoria insuficiente | Cierra apps en segundo plano |
 | El bot responde `El paquete está corrompido` | npm cache | `npm cache clean --force && npm install` |
 | `ffmpeg: not found` | ffmpeg no instalado | `pkg install -y ffmpeg` |
-| El bot se cierra solo | Android mata el proceso | Usa `tmux` o `nohup` (sección 11) |
+| El bot se cierra solo | Android mata el proceso | Usa `tmux` o `nohup` (sección 10) |
 | `Sesión expirada` en WhatsApp | WhatsApp cerró la sesión | Borra `session/` y vuelve a escanear el QR |
+| El bot inicia con la versión vieja (`whatsapp-web.js`) o error `Browser was not found ... chrome.exe` | Actualización incompleta | Fuerza la actualización limpia (sección 11) y verifica que `package.json` diga `1.1.0` |
+| `.ia` / `.img` no responden | `GEMINI_API_KEY` no configurada | Agrega `GEMINI_API_KEY=...` al `.env` (sección 8) |
 | Instalación de paquetes lenta | Red lenta | Sé paciente; `pkg` retoma donde se quedó |
 
 **¿Error raro?** Revisa el log completo:
