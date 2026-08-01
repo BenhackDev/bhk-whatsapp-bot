@@ -127,7 +127,12 @@ El bot funciona **sin navegador** (Baileys): no necesita Chrome, Chromium ni Pup
 
 ## 🚀 Instalación
 
-### ⚡ Instalación rápida (3 comandos)
+**Selecciona tu plataforma:**
+
+| [🪟 Windows](#windows) | [🐧 Linux / macOS](#linux--macos) | [📱 Android / Termux](#android--termux) | [☁️ VPS / Docker](#vps--docker) |
+|:---:|:---:|:---:|:---:|
+
+### ⚡ Instalación rápida (funciona en todas las plataformas)
 
 ```bash
 git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
@@ -135,49 +140,151 @@ cd bhk-whatsapp-bot
 npm install
 ```
 
-### 📋 Instalación paso a paso
+<a id="windows"></a>
+<details>
+<summary><b>🪟 Windows</b></summary>
 
-**1. Instala Node.js ≥ 18**
-- **Windows:** descarga el instalador desde [nodejs.org](https://nodejs.org)
-- **Linux/macOS:** `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install -y nodejs`
+1. **Instala Node.js ≥ 18:** descarga el instalador desde [nodejs.org](https://nodejs.org)
+2. **Clona el repositorio e instala dependencias:**
 
-**2. Clona el repositorio**
+   ```bash
+   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   cd bhk-whatsapp-bot
+   npm install
+   ```
 
-```bash
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
-cd bhk-whatsapp-bot
-```
+3. **Configura las variables de entorno:**
 
-**3. Instala las dependencias**
+   ```bash
+   copy .env.example .env
+   ```
 
-```bash
-npm install
-```
+   Edita `.env` y pon tu `GEMINI_API_KEY` (gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey))
 
-**4. Configura las variables de entorno**
+4. **Herramientas externas (opcionales):**
+   - **ffmpeg** (para `.voz`): `winget install ffmpeg` o [descarga manual](https://ffmpeg.org/download.html) y agrégalo al PATH
+   - **yt-dlp** (para `.tiktok`): `pip install yt-dlp` o [descarga el .exe](https://github.com/yt-dlp/yt-dlp/releases) y agrégalo al PATH
 
-```bash
-cp .env.example .env
-```
+5. **Inicia el bot y escanea el QR:**
 
-Abre `.env` con tu editor y configura al menos `GEMINI_API_KEY` (gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)).
+   ```bash
+   npm start
+   ```
 
-**5. Instala las herramientas externas**
+   WhatsApp → *Menú → Dispositivos vinculados → Vincular dispositivo*
 
-- **ffmpeg** (para `.voz`): [guía oficial](https://ffmpeg.org/download.html) — en Windows agrégalo al PATH
-- **yt-dlp** (para `.tiktok`): [descarga](https://github.com/yt-dlp/yt-dlp/releases) — en Windows se detecta en `%USERPROFILE%\AppData\Roaming\Python\Python3XX\Scripts\`
+🎉 ¡Listo! Guía extendida: [INSTALL.md](INSTALL.md)
+</details>
 
-**6. Inicia el bot**
+<a id="linux--macos"></a>
+<details>
+<summary><b>🐧 Linux / macOS</b></summary>
 
-```bash
-npm start
-```
+1. **Instala Node.js ≥ 18:**
+   - **Debian/Ubuntu:** `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install -y nodejs`
+   - **macOS:** `brew install node`
 
-**7. Escanea el código QR** con tu WhatsApp: *Menú → Dispositivos vinculados → Vincular dispositivo*
+2. **Clona el repositorio e instala dependencias:**
 
-🎉 ¡Listo! El bot está online y responderá a los comandos.
+   ```bash
+   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   cd bhk-whatsapp-bot
+   npm install
+   ```
 
-> 📱 ¿Instalación en **Termux (Android)**, **Windows** o **Linux** en detalle? Mira **[INSTALL.md](INSTALL.md)** y **[TERMUX.md](TERMUX.md)**.
+3. **Configura las variables de entorno:**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edita `.env` y pon tu `GEMINI_API_KEY` (gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey))
+
+4. **Herramientas externas (opcionales):**
+   - **ffmpeg** (para `.voz`): `sudo apt install -y ffmpeg`
+   - **yt-dlp** (para `.tiktok`): `pip install yt-dlp`
+
+5. **Inicia el bot y escanea el QR:**
+
+   ```bash
+   npm start
+   ```
+
+   WhatsApp → *Menú → Dispositivos vinculados → Vincular dispositivo*
+
+🎉 ¡Listo! Guía extendida: [INSTALL.md](INSTALL.md)
+</details>
+
+<a id="android--termux"></a>
+<details>
+<summary><b>📱 Android / Termux</b></summary>
+
+1. **Instala Termux** desde [F-Droid](https://f-droid.org/packages/com.termux/) (no de Play Store) y abre la app
+2. **Actualiza e instala dependencias:**
+
+   ```bash
+   pkg update && pkg upgrade -y
+   pkg install -y nodejs git ffmpeg python
+   ```
+
+3. **Clona el repositorio e instala dependencias:**
+
+   ```bash
+   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   cd bhk-whatsapp-bot
+   npm install
+   ```
+
+4. **Configura las variables de entorno:**
+
+   ```bash
+   cp .env.example .env
+   nano .env
+   ```
+
+   Pon tu `GEMINI_API_KEY` (gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)) y guarda con `Ctrl + O`, `Enter`, `Ctrl + X`
+
+5. **yt-dlp (opcional, para `.tiktok`):** `pip install yt-dlp`
+
+6. **Inicia el bot y escanea el QR:**
+
+   ```bash
+   npm start
+   ```
+
+   WhatsApp → *Menú → Dispositivos vinculados → Vincular dispositivo*
+
+🎉 ¡Listo! Guía completa: [TERMUX.md](TERMUX.md)
+</details>
+
+<a id="vps--docker"></a>
+<details>
+<summary><b>☁️ VPS / Docker</b></summary>
+
+1. **Instala Node.js ≥ 18** (`apt install -y nodejs` o con [nvm](https://github.com/nvm-sh/nvm)) y **git**
+2. **Clona e instala:**
+
+   ```bash
+   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   cd bhk-whatsapp-bot
+   npm install
+   ```
+
+3. **Configura `.env`** como en Linux (`cp .env.example .env`) y pon tu `GEMINI_API_KEY`
+4. **Inicia y mantén activo 24/7 con pm2:**
+
+   ```bash
+   npm install -g pm2
+   pm2 start bhk-bot.js --name bhk-bot
+   pm2 save && pm2 startup
+   ```
+
+5. **Escanea el QR** una vez (sale por terminal o usando `tmux` si estás por SSH)
+
+🎉 ¡Listo! Guía extendida: [docs/deployment.md](docs/deployment.md)
+</details>
+
+> 🔍 ¿Problemas en cualquier plataforma? Revisa [docs/troubleshooting.md](docs/troubleshooting.md).
 
 ## ⚙️ Configuración
 
@@ -345,7 +452,7 @@ Sí: edita `PREFIX_LIST` en `.env`, por ejemplo `PREFIX_LIST=.,!` para usar solo
 |---|---|---|
 | El bot no inicia con `SyntaxError` | Código modificado con error | Ejecuta `npm run check` y corrige el archivo señalado |
 | `GEMINI_API_KEY no configurada` | Falta la clave en `.env` | Obtén tu clave [aquí](https://aistudio.google.com/apikey) y configúrala |
-| El QR no aparece | Chrome no está instalado | Instala Google Chrome y reinicia el bot |
+| El QR no aparece | El bot ya tiene una sesión vinculada | Borra `session/` y reinicia el bot |
 | `.tiktok` responde "yt-dlp no está instalado" | Falta yt-dlp o no está en el PATH | [Descárgalo](https://github.com/yt-dlp/yt-dlp/releases) y agrégalo al PATH |
 | `.voz` falla con error de ffmpeg | ffmpeg no está instalado | Instala ffmpeg y verifica con `ffmpeg -version` |
 | Error `HTTP Error 403` en TikTok | TikTok bloqueó la descarga | Intenta con otro video; TikTok bloquea temporalmente IPs de datacenter |
