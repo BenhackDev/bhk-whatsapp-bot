@@ -38,7 +38,7 @@ async function routeCommand(parsed, message, client) {
             break;
 
         default:
-            await client.sendMessage(message.from,
+            await client.sendText(message.from,
                 `❌ Comando "*${parsed.command}*" no reconocido.\n` +
                 `Escribe *${parsed.prefix}menu* para ver los comandos disponibles.`
             );

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { MessageMedia } = require('whatsapp-web.js');
+const { BotMedia } = require('../infrastructure/whatsapp/client');
 const { PREFIXES } = require('../config/constants');
 
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -124,8 +124,8 @@ async function generateImage(client, message) {
         }
         caption += '∧🎩∧ \n(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n⊃⊂ \\○ \n*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*';
 
-        const media = MessageMedia.fromFilePath(rutaArchivo);
-        await client.sendMessage(message.from, media, { caption });
+        const media = BotMedia.fromFilePath(rutaArchivo);
+        await client.sendMedia(message.from, media, { caption });
 
         fs.unlinkSync(rutaArchivo);
 
@@ -193,8 +193,8 @@ async function generateImageAI(client, message) {
         }
         caption += '∧🎩∧ \n(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n⊃⊂ \\○ \n*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*';
 
-        const media = MessageMedia.fromFilePath(rutaArchivo);
-        await client.sendMessage(message.from, media, { caption });
+        const media = BotMedia.fromFilePath(rutaArchivo);
+        await client.sendMedia(message.from, media, { caption });
 
         fs.unlinkSync(rutaArchivo);
 

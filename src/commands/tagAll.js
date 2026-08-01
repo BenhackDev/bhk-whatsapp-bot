@@ -2,7 +2,7 @@ const { getUserById } = require('../services/userService');
 
 async function executeTagAll(client, message) {
     try {
-        const chat = await message.getChat();
+        const chat = await client.getGroupMetadata(message.from);
 
         const isGroup = !!(chat.participants && chat.participants.length > 0);
 
@@ -20,7 +20,7 @@ async function executeTagAll(client, message) {
         }
 
         const senderId = message.author || message.from.replace('@g.us', '@c.us');
-        const botNumber = client.info.wid._serialized;
+        const botNumber = client.getMyId();
         const participant = chat.participants.find(p => p.id._serialized === senderId);
 
         const esAdmin = participant && (
@@ -55,7 +55,7 @@ async function executeTagAll(client, message) {
             }
         }
 
-        await chat.sendMessage(mentionText, { mentions });
+        await client.sendText(message.from, mentionText, { mentions });
 
     } catch (error) {
         console.error('[ERROR TAGALL]', error);

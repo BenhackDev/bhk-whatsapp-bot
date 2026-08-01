@@ -2,7 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { MessageMedia } = require('whatsapp-web.js');
+const { BotMedia } = require('../infrastructure/whatsapp/client');
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const VOICE_ID = 'EkK5I93UQWFDigLMpZcX';
@@ -85,8 +85,8 @@ async function processVoiceCommand(client, message) {
         convertToOpus(mp3Path, oggPath);
 
         const oggBuffer = fs.readFileSync(oggPath);
-        const media = new MessageMedia('audio/ogg; codecs=opus', oggBuffer.toString('base64'), `voz_${Date.now()}.ogg`);
-        await client.sendMessage(message.from, media, { sendAudioAsVoice: true });
+        const media = BotMedia.fromBuffer(oggBuffer, 'audio/ogg; codecs=opus', `voz_${Date.now()}.ogg`);
+        await client.sendMedia(message.from, media, { asVoice: true });
 
         fs.unlinkSync(mp3Path);
         fs.unlinkSync(oggPath);

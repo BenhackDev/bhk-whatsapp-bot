@@ -30,7 +30,7 @@ async function showMenu(client, message, userId) {
 
 ✦ Escribe el comando que quieras usar.`;
 
-    await client.sendMessage(message.from, menu);
+    await client.sendText(message.from, menu);
 }
 
 module.exports = { showMenu };

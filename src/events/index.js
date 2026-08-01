@@ -5,12 +5,14 @@ const { handleMessage } = require('./message');
 const { handleDisconnected } = require('./disconnected');
 
 function registerEvents(client) {
-    client.on('qr', handleQr);
-    client.on('authenticated', handleAuthenticated);
-    client.on('auth_failure', handleAuthFailure);
-    client.on('ready', handleReady);
-    client.on('message_create', (msg) => handleMessage(msg, client));
-    client.on('disconnected', handleDisconnected);
+    client.onQR(handleQr);
+    client.onReady(() => {
+        handleAuthenticated();
+        handleReady();
+    });
+    client.onAuthFailure(handleAuthFailure);
+    client.onMessage((msg) => handleMessage(msg, client));
+    client.onDisconnect(handleDisconnected);
 }
 
 module.exports = { registerEvents };

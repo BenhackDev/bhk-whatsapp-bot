@@ -1,7 +1,7 @@
 {
   "name": "bhk-bot",
-  "version": "1.0.0",
-  "description": "🤖 BHK WhatsApp Bot — Bot de WhatsApp profesional con IA (Gemini), generación de imágenes, descarga de TikTok, texto a voz y más. Node.js + whatsapp-web.js",
+  "version": "1.1.0",
+  "description": "🤖 BHK WhatsApp Bot — Bot de WhatsApp profesional con IA (Gemini), generación de imágenes, descarga de TikTok, texto a voz y más. Node.js + Baileys, sin navegador",
   "main": "bhk-bot.js",
   "scripts": {
     "start": "node bhk-bot.js",
@@ -12,8 +12,7 @@
     "whatsapp",
     "bot",
     "whatsapp-bot",
-    "whatsapp-web",
-    "whatsapp-web.js",
+    "baileys",
     "gemini",
     "gemini-ai",
     "ai",
@@ -24,6 +23,7 @@
     "text-to-speech",
     "automation",
     "whatsapp-automation",
+    "termux",
     "open-source"
   ],
   "license": "MIT",
@@ -48,10 +48,10 @@
   },
   "dependencies": {
     "@google/genai": "^1.8.1",
+    "@whiskeysockets/baileys": "^6.7.24",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "mysql2": "^3.12.0",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.26.0"
+    "qrcode-terminal": "^0.12.0"
   }
 }

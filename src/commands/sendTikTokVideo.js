@@ -1,4 +1,4 @@
-const { MessageMedia } = require('whatsapp-web.js');
+const { BotMedia } = require('../infrastructure/whatsapp/client');
 const fs = require('fs');
 
 function formatDuration(segundos) {
@@ -10,7 +10,7 @@ function formatDuration(segundos) {
 
 async function sendTikTokVideo(client, message, data) {
     try {
-        const media = MessageMedia.fromFilePath(data.filePath);
+        const media = BotMedia.fromFilePath(data.filePath);
 
         let caption = '🎬 *TikTok descargado* 🎬\n';
         caption += '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n';
@@ -25,7 +25,7 @@ async function sendTikTokVideo(client, message, data) {
 
         caption += '\n∧🎩∧ \n(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n⊃⊂ \\○ \n*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*';
 
-        await client.sendMessage(message.from, media, { caption });
+        await client.sendMedia(message.from, media, { caption });
     } catch (error) {
         console.error('[ERROR sendTikTokVideo]', error);
         throw error;
