@@ -9,7 +9,7 @@ Guías de instalación completas:
 
 ```bash
 # 1. Clonar
-git clone https://github.com/ben202gervacio-eng/bhk-whatsapp-bot.git
+git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 
 # 2. Dependencias
