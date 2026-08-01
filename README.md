@@ -127,10 +127,11 @@ El bot funciona **sin navegador** (Baileys): no necesita Chrome, Chromium ni Pup
 
 ## 🚀 Instalación
 
-**Selecciona tu plataforma:**
+**Selecciona tu plataforma y expande la que uses:**
 
-| [🪟 Windows](#windows) | [🐧 Linux / macOS](#linux--macos) | [📱 Android / Termux](#android--termux) | [☁️ VPS / Docker](#vps--docker) |
+| 🪟 Windows | 🐧 Linux / macOS | 📱 Android / Termux | ☁️ VPS / Docker |
 |:---:|:---:|:---:|:---:|
+| ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white) | ![Linux/macOS](https://img.shields.io/badge/Linux%2FmacOS-FCC624?style=for-the-badge&logo=linux&logoColor=black) | ![Android](https://img.shields.io/badge/Termux-3DDC84?style=for-the-badge&logo=android&logoColor=white) | ![VPS/Docker](https://img.shields.io/badge/VPS%2FDocker-2496ED?style=for-the-badge&logo=docker&logoColor=white) |
 
 ### ⚡ Instalación rápida (funciona en todas las plataformas)
 
@@ -140,7 +141,6 @@ cd bhk-whatsapp-bot
 npm install
 ```
 
-<a id="windows"></a>
 <details>
 <summary><b>🪟 Windows</b></summary>
 
@@ -176,7 +176,6 @@ npm install
 🎉 ¡Listo! Guía extendida: [INSTALL.md](INSTALL.md)
 </details>
 
-<a id="linux--macos"></a>
 <details>
 <summary><b>🐧 Linux / macOS</b></summary>
 
@@ -215,7 +214,6 @@ npm install
 🎉 ¡Listo! Guía extendida: [INSTALL.md](INSTALL.md)
 </details>
 
-<a id="android--termux"></a>
 <details>
 <summary><b>📱 Android / Termux</b></summary>
 
@@ -257,7 +255,6 @@ npm install
 🎉 ¡Listo! Guía completa: [TERMUX.md](TERMUX.md)
 </details>
 
-<a id="vps--docker"></a>
 <details>
 <summary><b>☁️ VPS / Docker</b></summary>
 
