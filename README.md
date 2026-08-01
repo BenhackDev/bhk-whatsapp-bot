@@ -127,12 +127,6 @@ El bot funciona **sin navegador** (Baileys): no necesita Chrome, Chromium ni Pup
 
 ## 🚀 Instalación
 
-**Selecciona tu plataforma y expande la que uses:**
-
-| 🪟 Windows | 🐧 Linux / macOS | 📱 Android / Termux | ☁️ VPS / Docker |
-|:---:|:---:|:---:|:---:|
-| ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white) | ![Linux/macOS](https://img.shields.io/badge/Linux%2FmacOS-FCC624?style=for-the-badge&logo=linux&logoColor=black) | ![Android](https://img.shields.io/badge/Termux-3DDC84?style=for-the-badge&logo=android&logoColor=white) | ![VPS/Docker](https://img.shields.io/badge/VPS%2FDocker-2496ED?style=for-the-badge&logo=docker&logoColor=white) |
-
 ### ⚡ Instalación rápida (funciona en todas las plataformas)
 
 ```bash
@@ -140,6 +134,12 @@ git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 npm install
 ```
+
+**Selecciona tu plataforma:**
+
+| 🪟 Windows | 🐧 Linux / macOS | 📱 Android / Termux | ☁️ VPS / Docker |
+|:---:|:---:|:---:|:---:|
+| ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white) | ![Linux/macOS](https://img.shields.io/badge/Linux%2FmacOS-FCC624?style=for-the-badge&logo=linux&logoColor=black) | ![Android](https://img.shields.io/badge/Termux-3DDC84?style=for-the-badge&logo=android&logoColor=white) | ![VPS/Docker](https://img.shields.io/badge/VPS%2FDocker-2496ED?style=for-the-badge&logo=docker&logoColor=white) |
 
 <details>
 <summary><b>🪟 Windows</b></summary>
