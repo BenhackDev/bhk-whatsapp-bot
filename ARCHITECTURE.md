@@ -19,7 +19,7 @@ Documento de referencia sobre la estructura, el flujo y la extensión del bot.
 
 ## 1. Visión general
 
-El bot está construido sobre **whatsapp-web.js**, que controla una instancia de WhatsApp Web mediante **Puppeteer** (Chrome). El código propio del proyecto se organiza en 4 capas:
+El bot está construido sobre **Baileys** a través de un **puerto propio** (`src/infrastructure/whatsapp/`), que conecta con WhatsApp **sin navegador** (nada de Chrome, Chromium ni Puppeteer). El código propio del proyecto se organiza en 4 capas:
 
 | Capa | Carpeta | Responsabilidad |
 |---|---|---|
@@ -46,8 +46,15 @@ package.json               → dependencias y scripts (start, dev, check)
 
 src/
 ├── config/
-│   ├── constants.js       → PREFIXES, SESSION_NAME, CHROME_PATHS, CHROME_ARGS, findChrome()
+│   ├── constants.js       → PREFIXES, SESSION_NAME
 │   └── database.js        → pool de conexiones MySQL + initializeDatabase() (crea tablas)
+├── infrastructure/
+│   └── whatsapp/          → 🔌 CAPA DE INFRAESTRUCTURA: ÚNICO lugar que conoce Baileys
+│       ├── client.js      →   puerto propio (interfaz): connect, sendText, sendMedia, onMessage...
+│       ├── adapter.js     →   implementación con Baileys (sin navegador, reconexión automática)
+│       ├── events.js      →   traducción de eventos Baileys → callbacks del puerto
+│       ├── session.js     →   sesión multi-file (session/<SESSION_NAME>)
+│       └── media.js       →   BotMedia (value object de media del proyecto)
 ├── commands/              → UN ARCHIVO POR COMANDO
 │   ├── index.js           → routeCommand(): enrutador switch
 │   ├── menu.js            → .menu / .ayuda
@@ -85,7 +92,7 @@ docs/                      → documentación de la wiki
 ```
 1. Usuario escribe:        .ia ¿qué es Node.js?
                               ↓
-2. evento 'message_create' (src/events/message.js)
+2. evento 'onMessage' (src/events/message.js)
    └─ ¿message.fromMe? → sí: ignorar
    └─ parseCommand(message.body)
       └─ detecta prefijo '.' → command 'ia', args '¿qué es Node.js?'
@@ -95,7 +102,7 @@ docs/                      → documentación de la wiki
                               ↓
 4. handleAICommand() (src/commands/ai.js)
    └─ llama a Gemini API → respuesta
-   └─ client.sendMessage(message.from, respuesta)
+   └─ client.sendText(message.from, respuesta)
                               ↓
 5. logUsage('ia', userId) (src/services/usageService.js)
    └─ INSERT en uso_bot (si MySQL está configurado)
@@ -121,7 +128,7 @@ async function createSticker(client, message) {
         const media = await message.downloadMedia();
         // ... lógica del sticker ...
 
-        await client.sendMessage(message.from, media, { sendMediaAsSticker: true });
+        await client.sendMedia(message.from, media, { type: 'sticker' });
     } catch (error) {
         console.error('[ERROR STICKER]', error);
         await message.reply('⚠️ Error al crear el sticker.');
@@ -132,7 +139,7 @@ module.exports = { createSticker };
 ```
 
 > Reglas del comando:
-> - Usa `message.reply(...)` para respuestas cortas y `client.sendMessage(message.from, ...)` para envíos
+> - Usa `message.reply(...)` para respuestas cortas y `client.sendText(...)` / `client.sendMedia(...)` para envíos
 > - Envuelve la lógica en `try/catch` con log `[ERROR NOMBRE]`
 > - Exporta la función con nombre descriptivo
 
@@ -166,21 +173,21 @@ const { handleMessageReaction } = require('./reaction');
 
 function registerEvents(client) {
     // ...eventos existentes...
-    client.on('message_reaction', handleMessageReaction);
+    client.onMessage((msg) => handleMessage(msg, client));
 }
 ```
 
 Crea `src/events/reaction.js`:
 
 ```js
-function handleMessageReaction(reaction) {
-    console.log(`[REACCIÓN] ${reaction.senderId} reaccionó con ${reaction.reaction}`);
+function handleMessageReaction(message) {
+    console.log(`[REACCIÓN] ${message.author} reaccionó`);
 }
 
 module.exports = { handleMessageReaction };
 ```
 
-> 📚 Lista de eventos disponibles: [docs/events.md](docs/events.md)
+> 📚 El contrato del mensaje y los métodos del puerto están documentados en [src/infrastructure/whatsapp/client.js](../src/infrastructure/whatsapp/client.js)
 
 ## 6. Cómo agregar un servicio
 

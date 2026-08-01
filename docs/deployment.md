@@ -71,11 +71,9 @@ Guía completa: [TERMUX.md](../TERMUX.md#11-mantener-el-bot-activo)
 
 ## Notas para VPS sin pantalla
 
-- En la **primera** conexión whatsapp-web.js necesita ventana para el QR:
-  - Opción A: ejecuta el bot en tu PC, vincula el QR y **copia la carpeta `session/`** al VPS
-  - Opción B: usa túnel VNC/SSH-X11
-- Después de la primera conexión, `headless: true` puede activarse en `bhk-bot.js` si se desea
-- ⚠️ El flag `--no-sandbox` ya está incluido en `CHROME_ARGS` (requisito en la mayoría de VPS/containers)
+- El QR se imprime en la **terminal** (sin navegador ni ventana): basta con ejecutar `npm start`
+- Para mantener la sesión vinculada entre servidores, **copia la carpeta `session/`** (contiene los archivos JSON de autenticación)
+- La reconexión automática (backoff 1s → 30s) viene incluida en el adaptador; el bot no se cae por cortes de red
 
 ## MySQL en el servidor
 

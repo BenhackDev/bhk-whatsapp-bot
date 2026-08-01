@@ -3,7 +3,7 @@
 ## General
 
 **¿Qué es BHK WhatsApp Bot?**
-Un bot de WhatsApp Open Source hecho con Node.js y whatsapp-web.js, con IA (Gemini), generación de imágenes, descarga de TikTok y texto a voz. Es el proyecto de la serie de YouTube de [Tutos Benhack](https://www.youtube.com/@Tutos_benhack).
+Un bot de WhatsApp Open Source hecho con Node.js y Baileys (sin navegador), con IA (Gemini), generación de imágenes, descarga de TikTok y texto a voz. Funciona en Windows, Linux, macOS y Termux (Android). Es el proyecto de la serie de YouTube de [Tutos Benhack](https://www.youtube.com/@Tutos_benhack).
 
 **¿Cuánto cuesta?**
 Nada. El proyecto es MIT (gratis, incluso comercial). Las APIs tienen niveles gratuitos:
@@ -55,7 +55,7 @@ ffmpeg no está instalado o no está en el PATH. Verifica con `ffmpeg -version`.
 Node.js ≥ 18 (probado en 20 y 22).
 
 **¿Necesito Google Chrome?**
-Sí: whatsapp-web.js usa Chrome para conectar con WhatsApp Web. En Windows el bot lo detecta automáticamente; si no existe, usa el Chrome de Puppeteer.
+No. El bot usa **Baileys**, que conecta con WhatsApp sin navegador: nada de Chrome, Chromium ni Puppeteer. El QR se imprime directamente en la terminal.
 
 **¿Cómo actualizo el bot a la última versión?**
 ```bash

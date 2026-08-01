@@ -1,40 +1,40 @@
 # ⚡ Eventos
 
-Los eventos conectan el bot con whatsapp-web.js. Se registran en `src/events/index.js`.
+Los eventos conectan el bot con el **puerto de WhatsApp** (`src/infrastructure/whatsapp/client.js`). Se registran en `src/events/index.js`.
 
 ## Eventos actuales
 
-| Evento | Archivo | Comportamiento |
+| Método del puerto | Archivo | Comportamiento |
 |---|---|---|
-| `qr` | `qr.js` | Imprime el código QR en consola (una sola vez por proceso) |
-| `authenticated` | `auth.js` | Log de autenticación correcta |
-| `auth_failure` | `auth.js` | Log de fallo de autenticación |
-| `ready` | `ready.js` | Log "bot listo y funcionando" |
-| `message_create` | `message.js` | Pipeline principal: parsea y enruta mensajes |
-| `disconnected` | `disconnected.js` | Log de desconexión |
+| `onQR` | `qr.js` | Imprime el código QR en consola (una sola vez por proceso) |
+| `onReady` | `auth.js` + `ready.js` | Logs de autenticación correcta y "bot listo" |
+| `onAuthFailure` | `auth.js` | Log de fallo de autenticación (sesión cerrada) |
+| `onMessage` | `message.js` | Pipeline principal: parsea y enruta mensajes |
+| `onDisconnect` | `disconnected.js` | Log de desconexión |
 
-## Eventos más usados de whatsapp-web.js
+## Contrato del mensaje
 
-| Evento | Cuándo se emite |
-|---|---|
-| `message_create` | Cualquier mensaje creado (entrante o saliente) |
-| `message` | Mensajes entrantes |
-| `message_reaction` | Una reacción a un mensaje |
-| `group_join` / `group_leave` | Alguien entra/sale de un grupo |
-| `group_update` | Cambios en el grupo (nombre, foto, descripción) |
-| `call` | Llamada entrante |
-| `change_state` | Cambio de estado de conexión |
-| `disconnected` | Conexión perdida |
+Cada mensaje que llega a `onMessage` es un objeto propio del proyecto:
 
-> 📚 Lista completa: [documentación de whatsapp-web.js](https://docs.wwebjs.dev/Client.html#event:authenticated)
+```js
+{
+    body: 'texto del mensaje',
+    from: '51987654321@c.us',        // chat: @c.us (privado) o @g.us (grupo)
+    author: '51987654321@c.us',      // remitente (en grupos: el participante)
+    fromMe: false,
+    hasMedia: false,
+    reply(texto),                     // responde citando el mensaje
+    downloadMedia()                   // → BotMedia { mimetype, data, filename }
+}
+```
 
 ## Agregar un evento
 
 1. Crea `src/events/miEvento.js`:
 
 ```js
-function handleMiEvento(datos) {
-    console.log('[MI-EVENTO]', datos);
+function handleMiEvento(message) {
+    console.log('[MI-EVENTO]', message.body);
 }
 
 module.exports = { handleMiEvento };
@@ -45,9 +45,9 @@ module.exports = { handleMiEvento };
 ```js
 const { handleMiEvento } = require('./miEvento');
 // dentro de registerEvents:
-client.on('mi_evento', handleMiEvento);
+client.onMessage((msg) => handleMiEvento(msg, client));
 ```
 
 ## Reconexión
 
-Actualmente `disconnected` solo registra el evento. La **reconexión automática** (reintentos con backoff) está planificada en el roadmap v1.1.
+El adaptador (`src/infrastructure/whatsapp/adapter.js`) **reconecta automáticamente** con backoff (1s → 30s). Si la sesión se cierra desde el teléfono, se borra y se genera un QR nuevo.

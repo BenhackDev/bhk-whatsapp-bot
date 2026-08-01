@@ -9,6 +9,17 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/), y
 ### Añadido
 - Nada por ahora.
 
+## [1.1.0] - 2026-08-01
+
+### Cambiado
+- 🔌 **Motor de WhatsApp migrado a Baileys** (adios whatsapp-web.js y Puppeteer): el bot ya no necesita navegador, Chromium ni Chrome. Funciona en Windows, Linux, macOS, VPS, Docker y **Termux (Android)** con `pkg install nodejs git ffmpeg`.
+- 🏗️ **Nueva capa de infraestructura** `src/infrastructure/whatsapp/` con puerto propio (`client.js`): la lógica del bot ya no conoce la librería de WhatsApp; cambiar de motor (Baileys → otro) solo toca esa carpeta.
+- 🔄 **Reconexión automática** con backoff (1s → 30s) al caer la conexión; si la sesión se cierra desde el teléfono, se borra y se genera un QR nuevo.
+- 📦 `package.json`: eliminadas `whatsapp-web.js` y `puppeteer`; agregada `@whiskeysockets/baileys@6.7.24`.
+- 📚 Documentación actualizada (README, INSTALL, TERMUX, ARCHITECTURE, DEVELOPER_GUIDE, `docs/`) sin referencias a Chromium/Puppeteer.
+
+> ⚠️ **Nota de migración:** la sesión de la versión anterior (perfil Chrome) no es compatible. Borra `session/` y escanea el QR una sola vez.
+
 ## [1.0.0] - 2026-07-31
 
 ### Añadido

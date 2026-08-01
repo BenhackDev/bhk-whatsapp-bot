@@ -31,7 +31,7 @@
 
 ## ✨ ¿Qué es BHK WhatsApp Bot?
 
-**BHK WhatsApp Bot** es un bot de WhatsApp desarrollado con **Node.js** y **whatsapp-web.js** que convierte tu número de WhatsApp en un asistente con Inteligencia Artificial. Puedes **conversar con Gemini AI**, **generar imágenes con IA**, **descargar videos de TikTok**, **convertir texto a voz** y mucho más.
+**BHK WhatsApp Bot** es un bot de WhatsApp desarrollado con **Node.js** y **Baileys** que convierte tu número de WhatsApp en un asistente con Inteligencia Artificial. Puedes **conversar con Gemini AI**, **generar imágenes con IA**, **descargar videos de TikTok**, **convertir texto a voz** y mucho más. Funciona **sin navegador** (nada de Chromium ni Puppeteer), también en **Android (Termux)**.
 
 Es un proyecto **Open Source**, creado para la comunidad, y el protagonista de una **serie de YouTube** donde se enseña a desarrollarlo desde cero: desde la primera línea de código hasta su publicación en GitHub.
 
@@ -62,8 +62,7 @@ Es un proyecto **Open Source**, creado para la comunidad, y el protagonista de u
 | Tecnología | Uso |
 |---|---|
 | [Node.js](https://nodejs.org) ≥ 18 | Runtime del bot |
-| [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) | Conexión con WhatsApp Web |
-| [Puppeteer](https://pptr.dev) | Navegador headless para WhatsApp Web |
+| [Baileys](https://github.com/WhiskeySockets/Baileys) | Conexión con WhatsApp (sin navegador) |
 | [Google Gemini API](https://ai.google.dev) | Chat IA y generación de imágenes |
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | Descarga de videos de TikTok |
 | [ffmpeg](https://ffmpeg.org) | Conversión de audio (MP3 → OGG/Opus) |
@@ -78,10 +77,10 @@ Es un proyecto **Open Source**, creado para la comunidad, y el protagonista de u
                  │      WhatsApp (tu teléfono) │
                  └──────────────┬─────────────┘
                                 │ Escanea el QR
-                    ┌───────────▼───────────┐
-                    │   whatsapp-web.js     │
-                    │  (Puppeteer + Chrome) │
-                    └───────────┬───────────┘
+                   ┌────────────▼────────────┐
+                   │  src/infrastructure/    │
+                   │  whatsapp/ (Baileys)    │
+                   └────────────┬────────────┘
                                 │ eventos
                ┌────────────────▼────────────────┐
                │          bhk-bot.js             │
@@ -110,10 +109,21 @@ Flujo del mensaje: `mensaje → parseCommand() → routeCommand() → comando �
 |---|---|---|
 | [Node.js](https://nodejs.org) | ≥ 18 | Probado en Node 20 y 22 |
 | npm | ≥ 9 | Incluido con Node.js |
-| [Google Chrome](https://www.google.com/chrome/) | Actual | Detectado automáticamente en Windows/macOS |
 | [ffmpeg](https://ffmpeg.org/download.html) | Actual | Necesario solo para el comando `.voz` |
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) | Actual | Necesario solo para `.tiktok` |
 | MySQL (opcional) | 5.7+ | Solo si quieres registro de usuarios/uso |
+
+## 🖥️ Compatibilidad
+
+El bot funciona **sin navegador** (Baileys): no necesita Chrome, Chromium ni Puppeteer, y el QR se imprime en la terminal.
+
+| Entorno | Instalación | Inicio |
+|---|---|---|
+| Windows / Linux / macOS | `npm install` | `npm start` |
+| Android (Termux) | `pkg install -y nodejs git ffmpeg` + `npm install` | `npm start` |
+| VPS / Docker | `npm install` | `npm start` |
+
+> 📱 Guía completa para Android: [TERMUX.md](TERMUX.md). En Termux **no** hace falta Chromium ni `termux-chroot` — solo Node.js, git y ffmpeg.
 
 ## 🚀 Instalación
 
@@ -251,8 +261,15 @@ bhk-whatsapp-bot/
 ├── .env.example               # Plantilla de configuración
 ├── src/
 │   ├── config/
-│   │   ├── constants.js       # Prefijos, rutas de Chrome, args de Puppeteer
+│   │   ├── constants.js       # Prefijos y nombre de sesión
 │   │   └── database.js        # Conexión MySQL + creación de tablas
+│   ├── infrastructure/
+│   │   └── whatsapp/          # 🔌 Puerto de WhatsApp (ÚNICO lugar con Baileys)
+│   │       ├── client.js      #   Interfaz propia: sendText, sendMedia, onMessage...
+│   │       ├── adapter.js     #   Implementación con Baileys
+│   │       ├── events.js      #   Traducción de eventos Baileys
+│   │       ├── session.js     #   Sesión multi-file
+│   │       └── media.js       #   BotMedia (media del proyecto)
 │   ├── commands/              # ➕ Cada comando es un archivo
 │   │   ├── index.js           # Enrutador de comandos
 │   │   ├── menu.js            # .menu / .ayuda
@@ -262,7 +279,7 @@ bhk-whatsapp-bot/
 │   │   ├── sendTikTokVideo.js # Envío del video descargado
 │   │   ├── voice.js           # .voz (texto a voz)
 │   │   └── tagAll.js          # .tagall (grupos, solo admins)
-│   ├── events/                # ➕ Eventos de whatsapp-web.js
+│   ├── events/                # ➕ Eventos del puerto (onQR, onMessage...)
 │   │   ├── index.js           # Registro de eventos
 │   │   ├── qr.js              # QR de vinculación
 │   │   ├── auth.js            # Autenticación
@@ -377,7 +394,7 @@ Este proyecto está bajo la licencia **MIT** — ver [LICENSE](LICENSE) para má
 
 - **Autor:** [Tutos Benhack](https://www.youtube.com/@Tutos_benhack) — crea el proyecto, la serie en YouTube y los tutoriales en TikTok
 - **Comunidad:** cada persona que usa, prueba y contribuye al proyecto 💚
-- **Proyectos que hacen esto posible:** [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js), [Google Gemini](https://ai.google.dev), [yt-dlp](https://github.com/yt-dlp/yt-dlp), [ffmpeg](https://ffmpeg.org), [ElevenLabs](https://elevenlabs.io)
+- **Proyectos que hacen esto posible:** [Baileys](https://github.com/WhiskeySockets/Baileys), [Google Gemini](https://ai.google.dev), [yt-dlp](https://github.com/yt-dlp/yt-dlp), [ffmpeg](https://ffmpeg.org), [ElevenLabs](https://elevenlabs.io)
 
 ## 🌍 Comunidad
 

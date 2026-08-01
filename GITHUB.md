@@ -210,12 +210,12 @@ En la página principal del repo → rueda ⚙️ (Settings del repo):
 
 **Description:**
 ```
-🤖 Bot de WhatsApp con IA (Gemini), imágenes, TikTok, texto a voz y más — Node.js + whatsapp-web.js. Open Source.
+🤖 Bot de WhatsApp con IA (Gemini), imágenes, TikTok, texto a voz y más — Node.js + Baileys, sin navegador. Open Source.
 ```
 
 **Topics:**
 ```
-whatsapp-bot · nodejs · gemini · whatsapp-web · javascript · chatgpt-alternative · ai-bot · whatsapp-automation · tiktok-downloader · text-to-speech · open-source · bot
+whatsapp-bot · nodejs · gemini · baileys · javascript · chatgpt-alternative · ai-bot · whatsapp-automation · tiktok-downloader · text-to-speech · open-source · bot
 ```
 
 ### Badges

@@ -23,7 +23,6 @@ Instalación detallada para **Windows**, **Linux**, **macOS** y **Termux (Androi
 | Requisito | Mínimo | Para qué |
 |---|---|---|
 | Node.js | ≥ 18 | Runtime del bot |
-| Google Chrome | Cualquiera reciente | Conectar WhatsApp Web (se detecta automáticamente) |
 | ffmpeg | Cualquiera reciente | Solo comando `.voz` |
 | yt-dlp | Cualquiera reciente | Solo comandos `.tiktok` / `.tk` |
 | MySQL | Opcional | Solo registro de usuarios/uso |
@@ -52,12 +51,7 @@ node --version
 npm --version
 ```
 
-### 2.2 Instalar Chrome
-
-- Descarga e instala [Google Chrome](https://www.google.com/chrome/) si no lo tienes
-- El bot lo detecta automáticamente en `C:\Program Files\Google\Chrome\Application\chrome.exe`
-
-### 2.3 Instalar ffmpeg (para `.voz`)
+### 2.2 Instalar ffmpeg (para `.voz`)
 
 **Opción A — Instalador (recomendado):**
 1. Descarga de [gyan.dev/ffmpeg/builds](https://www.gyan.dev/ffmpeg/builds/) (build *release essentials*)
@@ -76,7 +70,7 @@ ffmpeg -version
 choco install ffmpeg -y
 ```
 
-### 2.4 Instalar yt-dlp (para `.tiktok`)
+### 2.3 Instalar yt-dlp (para `.tiktok`)
 
 **Opción A — Python (recomendado):** el bot lo detecta automáticamente en `%USERPROFILE%\AppData\Roaming\Python\Python3XX\Scripts\`
 ```powershell
@@ -92,7 +86,7 @@ pip install -U yt-dlp
 yt-dlp --version
 ```
 
-### 2.5 Instalar el bot
+### 2.4 Instalar el bot
 
 ```powershell
 git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
@@ -103,7 +97,7 @@ npm install
 
 Edita `.env` con el Bloc de notas y agrega tu `GEMINI_API_KEY`.
 
-### 2.6 Ejecutar
+### 2.5 Ejecutar
 
 ```powershell
 npm start
@@ -122,22 +116,13 @@ sudo apt-get install -y nodejs
 
 Verifica: `node --version && npm --version`
 
-### 3.2 Instalar Chrome
-
-```bash
-wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-sudo apt-get update
-sudo apt-get install -y google-chrome-stable
-```
-
-### 3.3 Instalar ffmpeg
+### 3.2 Instalar ffmpeg
 
 ```bash
 sudo apt-get install -y ffmpeg
 ```
 
-### 3.4 Instalar yt-dlp
+### 3.3 Instalar yt-dlp
 
 ```bash
 pip3 install -U yt-dlp
@@ -145,7 +130,7 @@ pip3 install -U yt-dlp
 
 > 💡 En Linux, el bot usa el binario `yt-dlp` directamente (debe estar en el PATH).
 
-### 3.5 Instalar y ejecutar el bot
+### 3.4 Instalar y ejecutar el bot
 
 ```bash
 git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
@@ -156,7 +141,7 @@ nano .env                      # agrega tu GEMINI_API_KEY
 npm start
 ```
 
-> 🌐 **Servidores sin pantalla (VPS):** whatsapp-web.js necesita mostrar una ventana para el QR en la primera conexión. Si tu VPS no tiene X11, usa un túnel SSH: `ssh -L 5900:localhost:5900` con VNC, o conecta desde tu PC local y luego copia la carpeta `session/` al servidor.
+> 🌐 **Servidores sin pantalla (VPS):** no hay problema — el bot imprime el QR en la terminal (no necesita ventana ni navegador). Puedes copiar la carpeta `session/` a otro servidor para mantener la sesión vinculada.
 
 ---
 
@@ -174,8 +159,6 @@ npm start
 brew install node git ffmpeg
 pip3 install -U yt-dlp        # o: brew install yt-dlp
 ```
-
-Chrome: descarga desde [google.com/chrome](https://www.google.com/chrome/) (en macOS el bot usa la ruta del perfil por defecto de Chrome).
 
 ### 4.3 Instalar y ejecutar el bot
 
@@ -205,7 +188,7 @@ npm install
 npm start
 ```
 
-> ⚠️ **Termux necesita pasos adicionales** (Chromium para whatsapp-web.js, almacenamiento compartido, modo headless). No te saltes [TERMUX.md](TERMUX.md).
+> 📱 Para más detalles en Termux, consulta [TERMUX.md](TERMUX.md).
 
 ---
 
@@ -241,9 +224,7 @@ npm start
 |---|---|---|
 | Windows | `ffmpeg no se reconoce` | Agregar ffmpeg al PATH y reiniciar terminal |
 | Windows | `yt-dlp no está instalado` | `pip install -U yt-dlp` o binario en el PATH |
-| Linux | `Error: No usable sandbox!` | Ejecutar con `--no-sandbox` (ya incluido en `CHROME_ARGS`) o instalar Chrome correctamente |
-| Linux | QR no aparece en VPS | Usar túnel SSH/VNC o copiar `session/` desde tu PC |
+| Linux | QR no aparece en VPS | El QR se imprime en la terminal; copia `session/` a tu PC y escanéalo |
 | macOS | `qrcode-terminal` bloqueado por Gatekeeper | Es npm, no requiere permisos especiales |
-| Termux | `spawn chromium ENOENT` | Instalar Chromium (ver [TERMUX.md](TERMUX.md)) |
 
 ¿Algo no funciona? Revisa [docs/troubleshooting.md](docs/troubleshooting.md) o abre un issue en el repositorio.

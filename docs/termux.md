@@ -9,7 +9,7 @@ Guía completa para instalar el bot en **Termux** (Android).
 ```bash
 # 1. Actualizar e instalar
 pkg update && pkg upgrade -y
-pkg install -y git nodejs-lts ffmpeg python chromium
+pkg install -y git nodejs-lts ffmpeg python
 pip install -U yt-dlp
 
 # 2. Clonar e instalar
@@ -28,7 +28,7 @@ npm start            # escanea el QR
 ## Puntos clave
 
 - **Termux desde F-Droid**, no de Play Store
-- **Chromium es obligatorio** (`pkg install -y chromium`) — es el navegador para WhatsApp Web
+- **Sin navegador**: el bot usa Baileys — no hace falta Chromium ni Puppeteer
 - **Mantener el proceso vivo:** `tmux` o `nohup` (Android mata procesos en segundo plano)
 - **Actualizar:** `git pull origin main && npm install`
 - **Borrar sesión:** `rm -rf session/*` y vuelve a escanear
@@ -37,8 +37,6 @@ npm start            # escanea el QR
 
 | Error | Solución |
 |---|---|
-| `chromium: command not found` | `pkg install -y chromium` |
-| `spawn chromium ENOENT` | Reinstala chromium y reinicia el bot |
 | QR cortado en pantalla | Rota el teléfono a horizontal |
 | El bot muere al bloquear pantalla | Usa `tmux`: `tmux new -s bot` → `npm start` → `Ctrl+B` + `D` |
 | `ffmpeg: not found` | `pkg install -y ffmpeg` |

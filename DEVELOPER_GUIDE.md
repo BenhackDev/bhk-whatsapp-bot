@@ -26,7 +26,7 @@ Documento técnico interno: cómo funciona el proyecto por dentro, su flujo de e
 
 | Componente | Tecnología | Rol |
 |---|---|---|
-| Cliente WhatsApp | `whatsapp-web.js` + Puppeteer | Conecta con WhatsApp Web usando Chrome |
+| Cliente WhatsApp | Baileys (vía puerto propio) | Conecta con WhatsApp sin navegador |
 | IA conversacional | Gemini API (`gemini-2.0-flash`) | Comando `.ia` |
 | Generación de imágenes | Gemini API (`gemini-2.0-flash-preview-image-generation`) | Comandos `.img` / `.img-ia` |
 | Descarga de videos | `yt-dlp` (binario externo) | Comandos `.tiktok` / `.tk` |
@@ -39,11 +39,11 @@ Documento técnico interno: cómo funciona el proyecto por dentro, su flujo de e
 npm start
   └─ bhk-bot.js
        ├─ require('dotenv').config()          → carga .env
-       ├─ createClient()                       → Client con Puppeteer (Chrome + sesión)
-       ├─ registerEvents(client)               → conecta eventos de whatsapp-web.js
+       ├─ createWhatsAppClient()              → puerto WhatsApp (interfaz propia, Baileys por dentro)
+       ├─ registerEvents(client)              → conecta eventos (onQR, onReady, onMessage...)
        └─ start()
-            ├─ await initializeDatabase()      → crea tablas si no existen (MySQL opcional)
-            └─ client.initialize()             → arranca WhatsApp Web (QR o sesión guardada)
+            ├─ await initializeDatabase()     → crea tablas si no existen (MySQL opcional)
+            └─ client.connect()               → conecta WhatsApp (QR o sesión guardada)
 
 Mensaje entrante (evento 'message_create')
   └─ handleMessage(msg, client)
@@ -56,21 +56,17 @@ Mensaje entrante (evento 'message_create')
 ## 3. Arranque del bot (bhk-bot.js)
 
 ```js
-const client = new Client({
-    puppeteer: {
-        headless: false,                        // ventana visible (QR y sesión)
-        executablePath: findChrome(),           // busca Chrome en rutas conocidas
-        userDataDir: path.join(__dirname, 'session', SESSION_NAME),
-        args: CHROME_ARGS                       // --no-sandbox, --disable-gpu, etc.
-    }
-});
+const { createWhatsAppClient } = require('./src/infrastructure/whatsapp/client');
+
+const client = createWhatsAppClient();   // puerto del proyecto: Baileys es solo un detalle interno
 ```
 
 Detalles clave:
 
-- **`findChrome()`** (`src/config/constants.js`): busca Chrome en las rutas típicas de Windows; si no existe, usa el Chrome descargado por Puppeteer.
+- **`createWhatsAppClient()`** (`src/infrastructure/whatsapp/client.js`): puerto propio del proyecto. **Ningún archivo fuera de `src/infrastructure/whatsapp/` importa Baileys** — la lógica del bot solo conoce esta interfaz (`connect`, `sendText`, `sendMedia`, `getGroupMetadata`, `onMessage`, `onReady`, `onQR`, `onDisconnect`, `onAuthFailure`).
 - **`SESSION_NAME`**: cada nombre genera una carpeta distinta en `session/`, es decir, una sesión/QR independiente.
-- **`headless: false`**: necesario en la primera conexión para ver el QR; si ya hay sesión guardada, la ventana se usa igualmente (se puede cambiar a `true` en servidores una vez autenticado).
+- **Sin navegador**: la sesión se guarda como archivos JSON en `session/` (auth multi-file de Baileys). No necesita Chrome, Chromium ni Puppeteer.
+- **Reconexión automática**: el adaptador reconecta con backoff (1s → 30s) al caer la conexión; si la sesión se cierra desde el teléfono, borra la sesión y genera un QR nuevo.
 - **Base de datos**: `initializeDatabase()` usa `CREATE TABLE IF NOT EXISTS` — si MySQL no está disponible, **el bot continúa** (degradación elegante).
 
 ## 4. Carga de comandos
@@ -84,7 +80,7 @@ async function routeCommand(parsed, message, client) {
         case 'ia':    await handleAICommand(...); break;
         // ...
         default:
-            await client.sendMessage(message.from,
+            await client.sendText(message.from,
                 `❌ Comando "*${parsed.command}*" no reconocido.\n` +
                 `Escribe *${parsed.prefix}menu* para ver los comandos disponibles.`);
     }
@@ -108,16 +104,15 @@ function parseCommand(body) {
 
 ## 5. Eventos
 
-`src/events/index.js` conecta los eventos de whatsapp-web.js:
+`src/events/index.js` conecta los eventos del puerto:
 
-| Evento | Handler | Qué hace |
+| Método del puerto | Handler | Qué hace |
 |---|---|---|
-| `qr` | `qr.js` | Imprime el QR (solo una vez por proceso) |
-| `authenticated` | `auth.js` | Log de éxito |
-| `auth_failure` | `auth.js` | Log de error |
-| `ready` | `ready.js` | Log "bot listo" (una sola vez) |
-| `message_create` | `message.js` | Pipeline principal de mensajes |
-| `disconnected` | `disconnected.js` | Log de desconexión (sin reconexión automática aún — roadmap v1.1) |
+| `onQR` | `qr.js` | Imprime el QR (solo una vez por proceso) |
+| `onReady` | `auth.js` + `ready.js` | Logs de autenticación y "bot listo" |
+| `onAuthFailure` | `auth.js` | Log de error (sesión cerrada) |
+| `onMessage` | `message.js` | Pipeline principal de mensajes |
+| `onDisconnect` | `disconnected.js` | Log de desconexión (el adaptador reconecta automáticamente) |
 
 > ⚠️ Los flags `qrShown` / `readyShown` / `authShown` evitan logs duplicados cuando WhatsApp Web emite el evento varias veces (por ejemplo, al regenerar el QR).
 
@@ -168,7 +163,7 @@ uso_bot (
 - Usa el **SDK `@google/genai`** con `responseModalities: ['TEXT', 'IMAGE']`
 - Modelo: `gemini-2.0-flash-preview-image-generation`
 - `.img-ia` adjunta la imagen del usuario como `inlineData` (mimeType + base64)
-- La imagen resultante se guarda en `temp/`, se envía como `MessageMedia` y se borra
+- La imagen resultante se guarda en `temp/`, se envía como `BotMedia` (`sendMedia`) y se borra
 - `API_KEY` se lee de `process.env.GEMINI_API_KEY`
 
 > ⚠️ **Inconsistencia conocida:** el chat usa REST (axios) y las imágenes usan el SDK. Unificarlo en un único cliente `@google/genai` es una mejora pendiente sugerida.
@@ -182,7 +177,7 @@ uso_bot (
    ```
    ffmpeg -y -loglevel error -i input.mp3 -c:a libopus -b:a 64k -vbr on -application voip output.ogg
    ```
-4. Se envía con `{ sendAudioAsVoice: true }` y se borran los temporales
+4. Se envía con `{ asVoice: true }` (`sendMedia`) y se borran los temporales
 
 > `VOICE_ID` está hardcodeado (`EkK5I93UQWFDigLMpZcX` — voz ElevenLabs). Mejora sugerida: mover a `.env` como `ELEVENLABS_VOICE_ID`.
 

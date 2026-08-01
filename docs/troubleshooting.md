@@ -20,19 +20,12 @@ El comando `.ia`, `.img` e `.img-ia` no funcionarán sin la clave.
 4. Reinicia el bot
 
 ### El QR no aparece
-- **¿Chrome instalado?** En Windows el bot lo detecta en las rutas típicas; en Linux debe estar instalado
+- **¿El puerto de WhatsApp quedó libre?** Cierra otra instancia del bot (WhatsApp solo permite un vínculo a la vez)
 - **¿Ya había sesión?** Borra `session/` y reinicia para forzar QR nuevo
 - **¿Salió una vez y desapareció?** El QR se muestra una sola vez por proceso; reinicia el bot si expiró
 
-### `Error: No usable sandbox!` (Linux)
-Ejecuta con el flag `--no-sandbox` (ya está incluido en `CHROME_ARGS` del proyecto). Si persiste, verifica que Chrome esté bien instalado: `google-chrome --version`.
-
-### `spawn chrome ENOENT` / `chrome not found`
-Puppeteer no encuentra el navegador. Instala Google Chrome (ver [INSTALL.md](../INSTALL.md)) o ejecuta:
-
-```bash
-npx puppeteer browsers install chrome
-```
+### `Sesión cerrada desde WhatsApp`
+El vínculo se eliminó desde el teléfono o la sesión expiró. El bot lo detecta, borra la sesión local y genera un QR nuevo al reconectar. Si no vuelve a aparecer, reinicia el bot con `npm start`.
 
 ## Errores de comandos
 
