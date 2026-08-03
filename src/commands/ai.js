@@ -1,5 +1,6 @@
 const axios = require('axios');
 require('dotenv/config');
+const { sendImageWithCaption } = require('../utils/mediaHelper');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -17,7 +18,7 @@ async function handleAICommand(message, client) {
         }
 
         const respuesta = await getGeminiResponse(prompt);
-        await client.sendText(message.from, respuesta);
+        await sendImageWithCaption(client, message.from, 'ia', respuesta);
     } catch (error) {
         console.error('[ERROR IA] No se pudo obtener respuesta:', error);
         await message.reply('⚠️ Lo siento, hubo un problema al procesar tu solicitud. Intenta más tarde.');

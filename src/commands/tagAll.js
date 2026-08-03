@@ -1,4 +1,5 @@
 const { getUserById } = require('../services/userService');
+const { sendImageWithCaption } = require('../utils/mediaHelper');
 
 async function executeTagAll(client, message) {
     try {
@@ -7,7 +8,7 @@ async function executeTagAll(client, message) {
         const isGroup = !!(chat.participants && chat.participants.length > 0);
 
         if (!isGroup) {
-            await message.reply(
+            await sendImageWithCaption(client, message.from, 'tagall',
                 '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
                 '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
                 '✨ *ʙʜᴋ-ʙᴏᴛ: ᴇꜱᴛᴇ ᴄᴏᴍᴀɴᴅᴏ ꜱᴏʟᴏ ꜰᴜɴᴄɪᴏɴᴀ ᴇɴ ɢʀᴜᴘᴏꜱ.*\n' +
@@ -31,7 +32,7 @@ async function executeTagAll(client, message) {
         );
 
         if (!esAdmin) {
-            await message.reply(
+            await sendImageWithCaption(client, message.from, 'tagall',
                 '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
                 '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
                 '✨ *ʙʜᴋ-ʙᴏᴛ: ꜱᴏʟᴏ ʟᴏꜱ ᴀᴅᴍɪɴɪꜱᴛʀᴀᴅᴏʀᴇꜱ ᴘᴜᴇᴅᴇɴ ᴜꜱᴀʀ ᴇꜱᴛᴇ ᴄᴏᴍᴀɴᴅᴏ.*\n' +
@@ -55,11 +56,11 @@ async function executeTagAll(client, message) {
             }
         }
 
-        await client.sendText(message.from, mentionText, { mentions });
+        await sendImageWithCaption(client, message.from, 'tagall', mentionText, { mentions });
 
     } catch (error) {
         console.error('[ERROR TAGALL]', error);
-        await message.reply(
+        await sendImageWithCaption(client, message.from, 'tagall',
             '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
             '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
             '✨ *ʙʜᴋ-ʙᴏᴛ: ᴏᴄᴜʀʀɪó ᴜɴ ᴇʀʀᴏʀ ᴀʟ ᴇᴊᴇᴄᴜᴛᴀʀ ᴇʟ ᴄᴏᴍᴀɴᴅᴏ.*\n' +

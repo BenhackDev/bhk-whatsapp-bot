@@ -1,4 +1,5 @@
 const { getUserById } = require('../services/userService');
+const { sendImageWithCaption } = require('../utils/mediaHelper');
 
 async function showMenu(client, message, userId) {
     let nombreUsuario = "Amix";
@@ -30,7 +31,7 @@ async function showMenu(client, message, userId) {
 
 ✦ Escribe el comando que quieras usar.`;
 
-    await client.sendText(message.from, menu);
+    await sendImageWithCaption(client, message.from, 'menu', menu);
 }
 
 module.exports = { showMenu };

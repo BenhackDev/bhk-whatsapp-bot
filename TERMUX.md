@@ -118,9 +118,14 @@ El bot registra los **usuarios** y el **uso de comandos** en MySQL. Esos datos s
 Crea las tablas con el esquema incluido en el proyecto:
 
 ```bash
-pkg install -y mariadb                # solo si quieres MySQL local en Termux
-mysql -u root -p < schema.sql
+pkg install -y mariadb                # solo si quieres MySQL local en Termux (ya inicializa los datos)
+mariadbd &                            # arranca el servidor (en cada uso)
+mysql -u root < schema.sql            # crea la base bhk_bot y sus tablas
 ```
+
+> ⚠️ En Termux, MariaDB arranca con `root` **sin contraseña** (`mysql -u root`, sin `-p`). El servidor **no se autoinicia**: si ves `ECONNREFUSED 127.0.0.1:3306`, ejecuta de nuevo `mariadbd &`.
+>
+> ⚠️ Si da error `bash: schema.sql: No such file or directory`, tu clon está desactualizado: `git pull origin main` y vuelve a intentarlo.
 
 **Opciones, de más a menos recomendada:**
 
@@ -223,7 +228,8 @@ npm start
 | Error | Causa | Solución |
 |---|---|---|
 | `ECONNREFUSED` o errores de red | Sin conexión estable | Repite `pkg install` / `npm install` |
-| `[DB] Error al inicializar: connect ECONNREFUSED 127.0.0.1:3306` | MySQL no está corriendo o credenciales mal | Arranca MySQL (`mysqld_safe &`) o revisa las variables `DB_*` del `.env` (sección 8) |
+| `[DB] Error al inicializar: connect ECONNREFUSED 127.0.0.1:3306` | MySQL no está corriendo o credenciales mal | Arranca MySQL con `mariadbd &` (sección 8) o revisa las variables `DB_*` del `.env` |
+| `bash: schema.sql: No such file or directory` | Clon desactualizado (falta `schema.sql`) | `git pull origin main` (sección 11) y repite la importación |
 | Pantalla del QR se ve cortada | Terminal pequeña | Rota el teléfono a horizontal o reduce el tamaño de letra |
 | `Termux` se cierra al instalar | Memoria insuficiente | Cierra apps en segundo plano |
 | El bot responde `El paquete está corrompido` | npm cache | `npm cache clean --force && npm install` |

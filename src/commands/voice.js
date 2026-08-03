@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const { BotMedia } = require('../infrastructure/whatsapp/client');
+const { sendImageWithCaption } = require('../utils/mediaHelper');
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const VOICE_ID = 'EkK5I93UQWFDigLMpZcX';
@@ -68,7 +69,7 @@ async function processVoiceCommand(client, message) {
         const texto = parsed ? parsed.args : '';
 
         if (!texto) {
-            await message.reply('❌ Escribe el texto después del comando. Ej: .voz Hola mundo');
+            await sendImageWithCaption(client, message.from, 'voz', '❌ Escribe el texto después del comando. Ej: .voz Hola mundo');
             return;
         }
 
@@ -92,7 +93,7 @@ async function processVoiceCommand(client, message) {
         fs.unlinkSync(oggPath);
     } catch (error) {
         console.error('[ERROR VOZ]', error);
-        await message.reply('⚠️ Error al generar el audio. Intenta de nuevo.');
+        await sendImageWithCaption(client, message.from, 'voz', '⚠️ Error al generar el audio. Intenta de nuevo.');
     }
 }
 

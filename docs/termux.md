@@ -25,6 +25,18 @@ nano .env            # pon tu GEMINI_API_KEY
 npm start            # escanea el QR
 ```
 
+## Base de datos MySQL (opcional)
+
+En Termux MariaDB no se autoinicia ni tiene contraseña de root:
+
+```bash
+pkg install -y mariadb   # ya inicializa los datos
+mariadbd &               # en cada uso (si ves ECONNREFUSED:3306, vuelve a lanzarlo)
+mysql -u root < schema.sql
+```
+
+> Si da `bash: schema.sql: No such file or directory`, tu clon está desactualizado: `git pull origin main`.
+
 ## Puntos clave
 
 - **Termux desde F-Droid**, no de Play Store
