@@ -48,6 +48,7 @@ Es un proyecto **Open Source**, creado para la comunidad, y el protagonista de u
 | `🗣️ .voz <texto>` | Convierte texto a **voz** (nota de audio) con ElevenLabs o TTS de Google |
 | `👥 .tagall` | Menciona a **todos los miembros** de un grupo (solo admins) |
 | `📋 .menu` / `.ayuda` | Muestra el menú interactivo del bot |
+| `👑 .creador` / `.owner` / `.redes` | Conoce al **creador** y sus redes sociales |
 
 **Extras técnicos:**
 - ✅ **Múltiples prefijos** configurables (`. # / $ ! %`)
@@ -300,6 +301,11 @@ Toda la configuración vive en el archivo `.env` (ver [.env.example](.env.exampl
 | `DB_PASSWORD` | ❌ | Contraseña de MySQL | *(vacía)* |
 | `DB_NAME` | ❌ | Nombre de la base de datos | `bhk_bot` |
 | `ELEVENLABS_API_KEY` | ❌ | Voz premium de ElevenLabs (si está vacía usa Google TTS) | — |
+| `BOT_NAME` | ❌ | Nombre del bot (firma de todos los mensajes) | `BHK-Bot` |
+| `CREATOR_NAME` | ❌ | Nombre del creador que aparece en la firma | `Tutos Benhack` |
+| `CREATOR_YOUTUBE` | ❌ | Canal de YouTube del creador | `https://www.youtube.com/@Tutos_benhack` |
+| `CREATOR_TIKTOK` | ❌ | TikTok del creador | `https://www.tiktok.com/@tutosbenhack` |
+| `CREATOR_GITHUB` | ❌ | GitHub del creador | `https://github.com/tutosbenhack` |
 
 > 💡 Si no configuras MySQL, el bot **funciona igual**: solo se desactivan el registro de usuarios y las estadísticas de uso.
 
@@ -333,6 +339,7 @@ npm run dev      # Ídem (mismo comportamiento en esta versión)
 | `.voz` | Texto a voz (nota de audio) | `.voz Hola comunidad, esto es BHK` |
 | `.tagall` | Mencionar a todos en el grupo (solo admins) | `.tagall` |
 | `.menu` / `.ayuda` | Ver menú del bot | `.menu` |
+| `.creador` / `.owner` / `.redes` | Ver al creador y sus redes | `.creador` |
 
 > Todos los comandos funcionan con **cualquier prefijo** configurado: `.menu`, `#menu`, `/menu`, `$menu`, `!menu`, `%menu`.
 

@@ -3,6 +3,7 @@ const path = require('path');
 const { BotMedia } = require('../infrastructure/whatsapp/client');
 const { PREFIXES } = require('../config/constants');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const { error, warn, status, build } = require('../config/branding');
 
 const API_KEY = process.env.GEMINI_API_KEY;
 
@@ -106,24 +107,23 @@ async function generateImage(client, message) {
 
         if (!prompt) {
             await sendImageWithCaption(client, message.from, 'img',
-                '❌ Debes escribir una descripción para la imagen.\n' +
-                'Ejemplo: .img un gato volador sobre una ciudad cyberpunk'
+                error('Debes escribir una descripción para la imagen.\nEjemplo: .img un gato volador sobre una ciudad cyberpunk')
             );
             return;
         }
 
-        await sendImageWithCaption(client, message.from, 'img', '🎨 *Generando imagen...* esto puede tomar unos segundos.');
+        await sendImageWithCaption(client, message.from, 'img', status('🎨 Generando imagen... esto puede tomar unos segundos.'));
 
         const { imageData, mimeType, textoRespuesta } = await generateImageWithGemini(prompt);
         const rutaArchivo = saveTempImage(imageData, mimeType);
 
-        let caption = '✨ *Imagen generada por Gemini AI* ✨\n';
-        caption += '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n';
-        caption += `📝 *${prompt.length > 80 ? prompt.slice(0, 80) + '...' : prompt}* \n`;
-        if (textoRespuesta) {
-            caption += `💬 ${textoRespuesta.slice(0, 200)} \n`;
-        }
-        caption += '∧🎩∧ \n(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n⊃⊂ \\○ \n*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*';
+        const caption = build(
+            [
+                { icon: '📝', label: 'Prompt', desc: prompt.length > 80 ? prompt.slice(0, 80) + '...' : prompt },
+                ...(textoRespuesta ? [{ icon: '💬', label: 'Gemini', desc: textoRespuesta.slice(0, 200) }] : [])
+            ],
+            { type: 'image', withSignature: true }
+        );
 
         const media = BotMedia.fromFilePath(rutaArchivo);
         await client.sendMedia(message.from, media, { caption });
@@ -134,23 +134,17 @@ async function generateImage(client, message) {
         console.error('[ERROR IMAGEN]', error);
 
         if (error.message && error.message.includes('@google/genai')) {
-            await sendImageWithCaption(client, message.from, 'img', '❌ *Error:* Falta instalar @google/genai. Ejecuta: npm install @google/genai');
+            await sendImageWithCaption(client, message.from, 'img', error('Falta instalar @google/genai. Ejecuta: npm install @google/genai'));
             return;
         }
 
         if (error.message && error.message.includes('API key not valid')) {
-            await sendImageWithCaption(client, message.from, 'img', '❌ *Error:* La clave de API de Gemini no es válida. Verifica tu API key.');
+            await sendImageWithCaption(client, message.from, 'img', error('La clave de API de Gemini no es válida. Verifica tu API key.'));
             return;
         }
 
         await sendImageWithCaption(client, message.from, 'img',
-            '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
-            '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
-            '✨ *ʙʜᴋ-ʙᴏᴛ: ᴏᴄᴜʀʀɪó ᴜɴ ᴇʀʀᴏʀ ᴀʟ ɢᴇɴᴇʀᴀʀ ʟᴀ ɪᴍᴀɢᴇɴ.*\n' +
-            ' ∧🎩∧ \n' +
-            '(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n' +
-            ' ⊃⊂ \\○ \n' +
-            '*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*'
+            warn('Ocurrió un error al generar la imagen.')
         );
     }
 }
@@ -161,8 +155,7 @@ async function generateImageAI(client, message) {
 
         if (!prompt) {
             await sendImageWithCaption(client, message.from, 'img-ia',
-                '❌ Debes escribir una descripción.\n' +
-                'Ejemplo: .img-ia haz esto más colorido (con una imagen adjunta)'
+                error('Debes escribir una descripción.\nEjemplo: .img-ia haz esto más colorido (con una imagen adjunta)')
             );
             return;
         }
@@ -178,21 +171,19 @@ async function generateImageAI(client, message) {
             }
         }
 
-        await sendImageWithCaption(client, message.from, 'img-ia', '🎨 *Procesando imagen con IA...* esto puede tomar unos segundos.');
+        await sendImageWithCaption(client, message.from, 'img-ia', status('🎨 Procesando imagen con IA... esto puede tomar unos segundos.'));
 
         const { imageData, mimeType, textoRespuesta } = await generateImageWithGemini(prompt, attachedImage);
         const rutaArchivo = saveTempImage(imageData, mimeType);
 
-        let caption = '✨ *Imagen generada por Gemini AI* ✨\n';
-        caption += '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n';
-        caption += `📝 *${prompt.length > 80 ? prompt.slice(0, 80) + '...' : prompt}* \n`;
-        if (attachedImage) {
-            caption += '🖼️ *Imagen de referencia incluida* \n';
-        }
-        if (textoRespuesta) {
-            caption += `💬 ${textoRespuesta.slice(0, 200)} \n`;
-        }
-        caption += '∧🎩∧ \n(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n⊃⊂ \\○ \n*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*';
+        const caption = build(
+            [
+                { icon: '📝', label: 'Prompt', desc: prompt.length > 80 ? prompt.slice(0, 80) + '...' : prompt },
+                ...(attachedImage ? [{ icon: '🖼️', label: 'Referencia', desc: 'Imagen adjunta incluida' }] : []),
+                ...(textoRespuesta ? [{ icon: '💬', label: 'Gemini', desc: textoRespuesta.slice(0, 200) }] : [])
+            ],
+            { type: 'image', withSignature: true }
+        );
 
         const media = BotMedia.fromFilePath(rutaArchivo);
         await client.sendMedia(message.from, media, { caption });
@@ -203,18 +194,12 @@ async function generateImageAI(client, message) {
         console.error('[ERROR IMAGEN-IA]', error);
 
         if (error.message && error.message.includes('@google/genai')) {
-            await sendImageWithCaption(client, message.from, 'img-ia', '❌ *Error:* Falta instalar @google/genai. Ejecuta: npm install @google/genai');
+            await sendImageWithCaption(client, message.from, 'img-ia', error('Falta instalar @google/genai. Ejecuta: npm install @google/genai'));
             return;
         }
 
         await sendImageWithCaption(client, message.from, 'img-ia',
-            '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
-            '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
-            '✨ *ʙʜᴋ-ʙᴏᴛ: ᴏᴄᴜʀʀɪó ᴜɴ ᴇʀʀᴏʀ ᴀʟ ᴘʀᴏᴄᴇꜱᴀʀ ʟᴀ ɪᴍᴀɢᴇɴ.*\n' +
-            ' ∧🎩∧ \n' +
-            '(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n' +
-            ' ⊃⊂ \\○ \n' +
-            '*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*'
+            warn('Ocurrió un error al procesar la imagen.')
         );
     }
 }

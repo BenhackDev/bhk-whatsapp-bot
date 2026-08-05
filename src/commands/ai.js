@@ -1,6 +1,7 @@
 const axios = require('axios');
 require('dotenv/config');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const { info, warn, error, status, CREATOR, SOCIALS } = require('../config/branding');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -8,12 +9,15 @@ if (!GEMINI_API_KEY || GEMINI_API_KEY === 'PEGA-TU-CLAVE-AQUI-BRO') {
     console.warn('[AI] ⚠️ GEMINI_API_KEY no configurada en .env. El comando .ia no funcionará.');
 }
 
+const SYSTEM_PROMPT = `Eres ${process.env.BOT_NAME || 'BHK-BOT'}, el asistente de WhatsApp creado por ${CREATOR.name}. Responde siempre en español con este tono: cercano y amable, profesional, claro y directo, motivador sin exagerar. Nunca respondas de forma fría o robótica; usa frases como "¡Listo!", "¡Claro!", "Con gusto". Usa emojis con moderación. Si te preguntan por tu creador o sus redes, di que te creó ${CREATOR.name} y que sus redes son: ${SOCIALS.map((s) => `${s.label} ${s.handle}`).join(', ')}.`;
+
 async function handleAICommand(message, client) {
     try {
         const prompt = message.body.replace(/^[.#\/$!%]/, '').trim().slice(2);
 
         if (!prompt) {
-            await message.reply('❌ Por favor escribe una pregunta después del comando. Ej: .ia ¿Qué es Node.js?');
+            await sendImageWithCaption(client, message.from, 'ia',
+                info('Por favor escribe una pregunta después del comando.\nEjemplo: .ia ¿Qué es Node.js?'));
             return;
         }
 
@@ -21,7 +25,8 @@ async function handleAICommand(message, client) {
         await sendImageWithCaption(client, message.from, 'ia', respuesta);
     } catch (error) {
         console.error('[ERROR IA] No se pudo obtener respuesta:', error);
-        await message.reply('⚠️ Lo siento, hubo un problema al procesar tu solicitud. Intenta más tarde.');
+        await sendImageWithCaption(client, message.from, 'ia',
+            error('Hubo un problema al procesar tu solicitud. Intenta más tarde.'));
     }
 }
 
@@ -34,6 +39,9 @@ async function getGeminiResponse(texto) {
             const respuesta = await axios.post(
                 `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
                 {
+                    systemInstruction: {
+                        parts: [{ text: SYSTEM_PROMPT }]
+                    },
                     contents: [{
                         parts: [{ text: texto }]
                     }],
@@ -56,7 +64,7 @@ async function getGeminiResponse(texto) {
 
             if (!contenido) {
                 console.log('[DEBUG] Respuesta completa de Gemini:', JSON.stringify(respuesta.data, null, 2));
-                return '🤖 No se pudo generar una respuesta adecuada.';
+                return status('No se pudo generar una respuesta adecuada.');
             }
 
             return contenido;
@@ -71,7 +79,7 @@ async function getGeminiResponse(texto) {
                     await new Promise(r => setTimeout(r, espera * 1000));
                     continue;
                 }
-                return '❌ Límite de la cuota gratuita de Gemini excedido. Espera un momento o genera una nueva API key en https://aistudio.google.com/apikey';
+                return warn('Límite de la cuota gratuita de Gemini excedido. Espera un momento o genera una nueva API key en https://aistudio.google.com/apikey');
             }
             throw error;
         }

@@ -4,12 +4,20 @@ const { generateImage, generateImageAI } = require('./image');
 const { processVoiceCommand } = require('./voice');
 const { executeTagAll } = require('./tagAll');
 const { processTikTokCommand } = require('./tiktok');
+const { showCreatorInfo } = require('./creator');
+const { error } = require('../config/branding');
 
 async function routeCommand(parsed, message, client) {
     switch (parsed.command) {
         case 'menu':
         case 'ayuda':
             await showMenu(client, message, message.author || message.from);
+            break;
+
+        case 'creador':
+        case 'owner':
+        case 'redes':
+            await showCreatorInfo(client, message);
             break;
 
         case 'ia':
@@ -38,10 +46,10 @@ async function routeCommand(parsed, message, client) {
             break;
 
         default:
-            await client.sendText(message.from,
-                `❌ Comando "*${parsed.command}*" no reconocido.\n` +
+            await client.sendText(message.from, error(
+                `Comando "*${parsed.command}*" no reconocido.\n` +
                 `Escribe *${parsed.prefix}menu* para ver los comandos disponibles.`
-            );
+            ));
     }
 }
 

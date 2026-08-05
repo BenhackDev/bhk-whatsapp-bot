@@ -1,5 +1,6 @@
 const { getUserById } = require('../services/userService');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const { error, warn, build, creditLine } = require('../config/branding');
 
 async function executeTagAll(client, message) {
     try {
@@ -9,13 +10,7 @@ async function executeTagAll(client, message) {
 
         if (!isGroup) {
             await sendImageWithCaption(client, message.from, 'tagall',
-                '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
-                '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
-                '✨ *ʙʜᴋ-ʙᴏᴛ: ᴇꜱᴛᴇ ᴄᴏᴍᴀɴᴅᴏ ꜱᴏʟᴏ ꜰᴜɴᴄɪᴏɴᴀ ᴇɴ ɢʀᴜᴘᴏꜱ.*\n' +
-                ' ∧🎩∧ \n' +
-                '(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n' +
-                ' ⊃⊂ \\○ \n' +
-                '*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*'
+                warn('Este comando solo funciona en grupos.')
             );
             return;
         }
@@ -33,20 +28,13 @@ async function executeTagAll(client, message) {
 
         if (!esAdmin) {
             await sendImageWithCaption(client, message.from, 'tagall',
-                '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
-                '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
-                '✨ *ʙʜᴋ-ʙᴏᴛ: ꜱᴏʟᴏ ʟᴏꜱ ᴀᴅᴍɪɴɪꜱᴛʀᴀᴅᴏʀᴇꜱ ᴘᴜᴇᴅᴇɴ ᴜꜱᴀʀ ᴇꜱᴛᴇ ᴄᴏᴍᴀɴᴅᴏ.*\n' +
-                ' ∧🎩∧ \n' +
-                '(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n' +
-                ' ⊃⊂ \\○ \n' +
-                '*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*'
+                warn('Solo los administradores pueden usar este comando.')
             );
             return;
         }
 
         const mentions = [];
-        let mentionText = '👑 *ATENCIÓN A TODOS LOS MIEMBROS* 👑\n';
-        mentionText += '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌\n\n';
+        let mentionText = '';
 
         for (const p of chat.participants) {
             if (p.id._serialized !== botNumber) {
@@ -56,18 +44,17 @@ async function executeTagAll(client, message) {
             }
         }
 
-        await sendImageWithCaption(client, message.from, 'tagall', mentionText, { mentions });
+        const mensaje = build(
+            [{ branch: `👥 ${mentionText.trim()}` }],
+            { type: 'tagall', close: creditLine() }
+        );
+
+        await sendImageWithCaption(client, message.from, 'tagall', mensaje, { mentions });
 
     } catch (error) {
         console.error('[ERROR TAGALL]', error);
         await sendImageWithCaption(client, message.from, 'tagall',
-            '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
-            '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
-            '✨ *ʙʜᴋ-ʙᴏᴛ: ᴏᴄᴜʀʀɪó ᴜɴ ᴇʀʀᴏʀ ᴀʟ ᴇᴊᴇᴄᴜᴛᴀʀ ᴇʟ ᴄᴏᴍᴀɴᴅᴏ.*\n' +
-            ' ∧🎩∧ \n' +
-            '(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n' +
-            ' ⊃⊂ \\○ \n' +
-            '*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*'
+            error('Ocurrió un error al ejecutar el comando.')
         );
     }
 }

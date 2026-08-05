@@ -12,7 +12,10 @@ const COMMAND_IMAGES = {
     voz: 'voz.webp',
     tagall: 'tagall.webp',
     tiktok: 'tk.webp',
-    tk: 'tk.webp'
+    tk: 'tk.webp',
+    creador: 'menu.webp',
+    owner: 'menu.webp',
+    redes: 'menu.webp'
 };
 
 function getImagePath(command) {

@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { sendTikTokVideo } = require('./sendTikTokVideo');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const { error, warn, status } = require('../config/branding');
 
 const execPromise = util.promisify(exec);
 const { PREFIXES } = require('../config/constants');
@@ -90,9 +91,7 @@ async function processTikTokCommand(client, message) {
         const ytDlpInstalado = await checkYtDlp();
         if (!ytDlpInstalado) {
             await sendImageWithCaption(client, message.from, 'tiktok',
-                '❌ *yt-dlp no está instalado.* \n' +
-                'Descárgalo desde: https://github.com/yt-dlp/yt-dlp/releases \n' +
-                'y agrégalo al PATH de Windows.'
+                error('yt-dlp no está instalado.\nDescárgalo desde: https://github.com/yt-dlp/yt-dlp/releases\ny agrégalo al PATH de Windows.')
             );
             return;
         }
@@ -101,18 +100,17 @@ async function processTikTokCommand(client, message) {
 
         if (!url) {
             await sendImageWithCaption(client, message.from, 'tiktok',
-                '❌ Debes proporcionar un enlace de TikTok.\n' +
-                'Ejemplo: .tiktok https://vm.tiktok.com/ABCDEF/'
+                error('Debes proporcionar un enlace de TikTok.\nEjemplo: .tiktok https://vm.tiktok.com/ABCDEF/')
             );
             return;
         }
 
         if (!isValidTikTokUrl(url)) {
-            await sendImageWithCaption(client, message.from, 'tiktok', '❌ El enlace no es una URL válida de TikTok.');
+            await sendImageWithCaption(client, message.from, 'tiktok', error('El enlace no es una URL válida de TikTok.'));
             return;
         }
 
-        await message.reply('⏳ *Descargando video de TikTok...* esto puede tomar un momento.');
+        await message.reply(status('⏳ Descargando video de TikTok... esto puede tomar un momento.'));
 
         const metadata = await getMetadata(url);
 
@@ -141,22 +139,16 @@ async function processTikTokCommand(client, message) {
         console.error('[ERROR TIKTOK]', error);
 
         if (error.message && error.message.includes('yt-dlp')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', '❌ Error al ejecutar yt-dlp. Verifica que esté correctamente instalado.');
+            await sendImageWithCaption(client, message.from, 'tiktok', error('Error al ejecutar yt-dlp. Verifica que esté correctamente instalado.'));
         } else if (error.message && error.message.includes('HTTP Error 403')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', '❌ TikTok bloqueó la descarga. Intenta con otro video.');
+            await sendImageWithCaption(client, message.from, 'tiktok', error('TikTok bloqueó la descarga. Intenta con otro video.'));
         } else if (error.message && error.message.includes('URL no es válida')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', '❌ La URL proporcionada no es válida.');
+            await sendImageWithCaption(client, message.from, 'tiktok', error('La URL proporcionada no es válida.'));
         } else if (error.stderr && error.stderr.includes('does not pass filter')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', '❌ No se pudo descargar el video. Es posible que sea privado o esté eliminado.');
+            await sendImageWithCaption(client, message.from, 'tiktok', error('No se pudo descargar el video. Es posible que sea privado o esté eliminado.'));
         } else {
             await sendImageWithCaption(client, message.from, 'tiktok',
-                '*👑᭄˗ˏˋ ⚠️ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀˎˊ˗🎩᭄* \n' +
-                '﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌ \n' +
-                '✨ *ʙʜᴋ-ʙᴏᴛ: ᴏᴄᴜʀʀɪó ᴜɴ ᴇʀʀᴏʀ ᴀʟ ᴅᴇꜱᴄᴀʀɢᴀʀ ᴇʟ ᴠɪᴅᴇᴏ.*\n' +
-                ' ∧🎩∧ \n' +
-                '(⌒‿⌒) ♡ʙᴇɴʜᴀᴄᴋ♡ \n' +
-                ' ⊃⊂ \\○ \n' +
-                '*✨ʙᴇɴᴅɪᴄɪᴏɴᴇꜱ ʏ Éxɪᴛᴏꜱ*'
+                warn('Ocurrió un error al descargar el video.')
             );
         }
 
