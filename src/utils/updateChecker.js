@@ -15,7 +15,7 @@ const pkg = require('../../package.json');
 
 const execFileAsync = promisify(execFile);
 
-const REPO_URL = 'https://github.com/tutosbenhack/bhk-whatsapp-bot.git';
+const REPO_URL = 'https://github.com/BenhackDev/bhk-whatsapp-bot.git';
 const BRANCH = 'main';
 const ROOT = path.join(__dirname, '..', '..');
 
