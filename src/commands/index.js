@@ -4,7 +4,9 @@ const { generateImage, generateImageAI } = require('./image');
 const { processVoiceCommand } = require('./voice');
 const { executeTagAll } = require('./tagAll');
 const { processTikTokCommand } = require('./tiktok');
+const { processYouTubeCommand } = require('./youtube');
 const { showCreatorInfo } = require('./creator');
+const { showStatus } = require('./status');
 const { error } = require('../config/branding');
 
 async function routeCommand(parsed, message, client) {
@@ -28,6 +30,9 @@ async function routeCommand(parsed, message, client) {
             await generateImage(client, message);
             break;
 
+        case 'editar':
+        case 'editar-ia':
+        case 'edit':
         case 'img-ia':
             await generateImageAI(client, message);
             break;
@@ -43,6 +48,15 @@ async function routeCommand(parsed, message, client) {
         case 'tiktok':
         case 'tk':
             await processTikTokCommand(client, message);
+            break;
+
+        case 'yt':
+            await processYouTubeCommand(client, message);
+            break;
+
+        case 'status':
+        case 'diagnostico':
+            await showStatus(client, message);
             break;
 
         default:

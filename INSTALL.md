@@ -194,17 +194,37 @@ npm start
 
 ## 6. Verificación final
 
-Tras `npm start` deberías ver:
+Tras `npm start` deberías ver una terminal limpia y profesional:
 
 ```
-╔══════════════════════════════════╗
-║       🤖 BHK-BOT INICIANDO      ║
-╚══════════════════════════════════╝
-[BOT] Inicializando cliente de WhatsApp...
-📱 ESCANEA ESTE CÓDIGO QR CON WHATSAPP:
+╔══════════════════════════════════════════╗
+║            🤖 BHK-BOT                    ║
+╚══════════════════════════════════════════╝
+
+🖥️ Sistema       Windows
+🟢 Node          v22.x (compatible)
+🟢 WhatsApp      Disponible
+🟡 Base de datos No configurada (funciones limitadas)
+🟢 IA            Disponible
+🟢 Voz           Google TTS
+🟢 Descargas     Disponible
+
+────────────────────────────────────────────
+
+📱 Esperando escaneo QR...
 ```
 
 Escanea el QR con tu WhatsApp: **Menú → Dispositivos vinculados → Vincular dispositivo**.
+
+Cuando conecta:
+
+```
+🔗 Cliente conectado.
+✅ Sesión autenticada.
+🚀 BHK-BOT listo para usarse.
+```
+
+> 💡 El detalle de la terminal se controla con `LOG_LEVEL` en `.env`: `silent` (solo errores críticos), `info` (por defecto), `debug` y `trace` (todo, incluidos logs de Baileys/MySQL).
 
 Prueba: `📱 .menu` y `💬 .ia Hola` (requiere `GEMINI_API_KEY`).
 

@@ -43,7 +43,7 @@ Es un proyecto **Open Source**, creado para la comunidad, y el protagonista de u
 |---|---|
 | `💬 .ia <pregunta>` | Conversa con **Gemini AI** (inteligencia artificial generativa) |
 | `🖼️ .img <descripción>` | Genera **imágenes con IA** desde texto |
-| `🖼️ .img-ia <prompt>` + foto | **Edita/transforma una imagen** adjunta con IA |
+| `🖼️ .editar <prompt>` + foto | **Edita/transforma una imagen adjunta** con IA (alias: `.img-ia`) |
 | `🎬 .tiktok <url>` / `.tk <url>` | **Descarga videos de TikTok** (título, autor y hashtags incluidos) |
 | `🗣️ .voz <texto>` | Convierte texto a **voz** (nota de audio) con ElevenLabs o TTS de Google |
 | `👥 .tagall` | Menciona a **todos los miembros** de un grupo (solo admins) |
@@ -301,6 +301,7 @@ Toda la configuración vive en el archivo `.env` (ver [.env.example](.env.exampl
 | `DB_PASSWORD` | ❌ | Contraseña de MySQL | *(vacía)* |
 | `DB_NAME` | ❌ | Nombre de la base de datos | `bhk_bot` |
 | `ELEVENLABS_API_KEY` | ❌ | Voz premium de ElevenLabs (si está vacía usa Google TTS) | — |
+| `LOG_LEVEL` | ❌ | Nivel de logs: `silent`, `info`, `debug`, `trace` | `info` |
 | `BOT_NAME` | ❌ | Nombre del bot (firma de todos los mensajes) | `BHK-Bot` |
 | `CREATOR_NAME` | ❌ | Nombre del creador que aparece en la firma | `Tutos Benhack` |
 | `CREATOR_YOUTUBE` | ❌ | Canal de YouTube del creador | `https://www.youtube.com/@Tutos_benhack` |
@@ -319,14 +320,32 @@ npm run dev      # Ídem (mismo comportamiento en esta versión)
 ### ¿Cómo se ve al iniciar?
 
 ```
-╔══════════════════════════════════╗
-║       🤖 BHK-BOT INICIANDO      ║
-╚══════════════════════════════════╝
-[DB] Tablas verificadas/creadas correctamente   ← o "Continuando sin base de datos..."
-[BOT] Inicializando cliente de WhatsApp...
-📱 ESCANEA ESTE CÓDIGO QR CON WHATSAPP:
-[BOT] ✅ BHK-BOT está listo y funcionando!
+╔══════════════════════════════════════════╗
+║            🤖 BHK-BOT                    ║
+╚══════════════════════════════════════════╝
+
+🖥️ Sistema       Windows
+🟢 Node          v22.x (compatible)
+🟢 WhatsApp      Disponible
+🟡 Base de datos No configurada (funciones limitadas)
+🟢 IA            Disponible
+🟢 Voz           Google TTS
+🟢 Descargas     Disponible
+
+────────────────────────────────────────────
+
+📱 Esperando escaneo QR...
 ```
+
+Cuando el bot conecta:
+
+```
+🔗 Cliente conectado.
+✅ Sesión autenticada.
+🚀 BHK-BOT listo para usarse.
+```
+
+> 💡 El nivel de detalle se controla con `LOG_LEVEL`. En `info` (por defecto) solo ves lo importante; en `debug`/`trace` aparecen los logs técnicos y de librerías (Baileys, MySQL, etc.). Para un arranque totalmente silencioso usa `LOG_LEVEL=silent` (solo errores críticos).
 
 ## 🧠 Comandos disponibles
 
@@ -334,7 +353,7 @@ npm run dev      # Ídem (mismo comportamiento en esta versión)
 |---|---|---|
 | `.ia` | Chat con Gemini AI | `.ia ¿qué es Node.js?` |
 | `.img` | Generar imagen con IA | `.img un gato volador en una ciudad cyberpunk` |
-| `.img-ia` | Editar imagen adjunta | `.img-ia haz esto más colorido` + foto |
+| `.editar` / `.img-ia` | Editar imagen adjunta | `.editar haz esto más colorido` + foto |
 | `.tiktok` / `.tk` | Descargar video de TikTok | `.tk https://vm.tiktok.com/ABCDEF/` |
 | `.voz` | Texto a voz (nota de audio) | `.voz Hola comunidad, esto es BHK` |
 | `.tagall` | Mencionar a todos en el grupo (solo admins) | `.tagall` |

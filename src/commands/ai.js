@@ -1,12 +1,16 @@
 const axios = require('axios');
 require('dotenv/config');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const logger = require('../utils/logger');
+const registry = require('../cli/serviceRegistry');
 const { info, warn, error, status, CREATOR, SOCIALS } = require('../config/branding');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 if (!GEMINI_API_KEY || GEMINI_API_KEY === 'PEGA-TU-CLAVE-AQUI-BRO') {
-    console.warn('[AI] ⚠️ GEMINI_API_KEY no configurada en .env. El comando .ia no funcionará.');
+    registry.setService('gemini', 'optional', 'no configurada', true);
+} else {
+    registry.setService('gemini', 'ok');
 }
 
 const SYSTEM_PROMPT = `Eres ${process.env.BOT_NAME || 'BHK-BOT'}, el asistente de WhatsApp creado por ${CREATOR.name}. Responde siempre en español con este tono: cercano y amable, profesional, claro y directo, motivador sin exagerar. Nunca respondas de forma fría o robótica; usa frases como "¡Listo!", "¡Claro!", "Con gusto". Usa emojis con moderación. Si te preguntan por tu creador o sus redes, di que te creó ${CREATOR.name} y que sus redes son: ${SOCIALS.map((s) => `${s.label} ${s.handle}`).join(', ')}.`;
@@ -24,7 +28,7 @@ async function handleAICommand(message, client) {
         const respuesta = await getGeminiResponse(prompt);
         await sendImageWithCaption(client, message.from, 'ia', respuesta);
     } catch (error) {
-        console.error('[ERROR IA] No se pudo obtener respuesta:', error);
+        logger.debug('[AI] No se pudo obtener respuesta:', error);
         await sendImageWithCaption(client, message.from, 'ia',
             error('Hubo un problema al procesar tu solicitud. Intenta más tarde.'));
     }
@@ -63,7 +67,7 @@ async function getGeminiResponse(texto) {
             const contenido = respuesta.data.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (!contenido) {
-                console.log('[DEBUG] Respuesta completa de Gemini:', JSON.stringify(respuesta.data, null, 2));
+                logger.debug('[AI] Respuesta completa de Gemini:', JSON.stringify(respuesta.data, null, 2));
                 return status('No se pudo generar una respuesta adecuada.');
             }
 
@@ -75,7 +79,7 @@ async function getGeminiResponse(texto) {
                 const espera = match ? Math.min(parseInt(match[1]) + 1, 30) : 20;
 
                 if (intento < MAX_RETRIES) {
-                    console.log(`[AI] Cuota excedida, reintentando en ${espera}s (intento ${intento}/${MAX_RETRIES})...`);
+                    logger.debug(`[AI] Cuota excedida, reintentando en ${espera}s (intento ${intento}/${MAX_RETRIES})...`);
                     await new Promise(r => setTimeout(r, espera * 1000));
                     continue;
                 }

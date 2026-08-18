@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { sendTikTokVideo } = require('./sendTikTokVideo');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const logger = require('../utils/logger');
 const { error, warn, status } = require('../config/branding');
 
 const execPromise = util.promisify(exec);
@@ -136,7 +137,7 @@ async function processTikTokCommand(client, message) {
         }
 
     } catch (error) {
-        console.error('[ERROR TIKTOK]', error);
+        logger.debug('[TIKTOK]', error);
 
         if (error.message && error.message.includes('yt-dlp')) {
             await sendImageWithCaption(client, message.from, 'tiktok', error('Error al ejecutar yt-dlp. Verifica que esté correctamente instalado.'));

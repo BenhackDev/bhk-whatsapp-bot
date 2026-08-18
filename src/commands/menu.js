@@ -1,5 +1,6 @@
 const { getUserById } = require('../services/userService');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const logger = require('../utils/logger');
 const { build, tip } = require('../config/branding');
 
 async function showMenu(client, message, userId) {
@@ -11,21 +12,25 @@ async function showMenu(client, message, userId) {
             nombreUsuario = usuario.alias;
         }
     } catch (error) {
-        console.error('Error al obtener los datos del usuario:', error);
+        logger.debug('[MENU] Error al obtener los datos del usuario:', error);
     }
 
     const menu = build(
         [
             `👋 ¡Hola, *${nombreUsuario}*!`,
-            { icon: '💬', label: '.ia', desc: 'Conversa con Gemini AI.' },
-            { icon: '🖤', label: '.tk', desc: 'Descarga video de TikTok.' },
+            { icon: '🤖', label: '.ia', desc: 'Conversa con Gemini AI.' },
+            { icon: '🖼️', label: '.img', desc: 'Genera imágenes con IA.' },
+            { icon: '🖼️', label: '.editar', desc: 'Edita una foto adjunta con IA (alias: .img-ia).' },
+            { icon: '📥', label: '.tk', desc: 'Descarga videos de TikTok.' },
+            { icon: '🎬', label: '.yt', desc: 'Descarga videos de YouTube (máx. 10 min).' },
             { icon: '🗣️', label: '.voz', desc: 'Convierte texto a voz.' },
-            { icon: '🧠', label: '.ayuda', desc: 'Aprende todas las funciones del bot.' },
-            { icon: '👑', label: '.creador', desc: 'Conoce al creador y sus redes.' }
+            { icon: '👥', label: '.tagall', desc: 'Menciona a todos en el grupo (solo admins).' },
+            { icon: '👑', label: '.creador', desc: 'Conoce al creador y sus redes.' },
+            { icon: '🧠', label: '.ayuda', desc: 'Aprende a usar el bot a fondo.' }
         ],
         {
             type: 'menu',
-            notes: [tip('Usa cualquier prefijo: . # / $ ! %')],
+            notes: [tip('Escribe el comando con cualquier prefijo: . # / $ ! %')],
             withSignature: true
         }
     );

@@ -1,5 +1,6 @@
 const { getUserById } = require('../services/userService');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const logger = require('../utils/logger');
 const { error, warn, build, creditLine } = require('../config/branding');
 
 async function executeTagAll(client, message) {
@@ -52,7 +53,7 @@ async function executeTagAll(client, message) {
         await sendImageWithCaption(client, message.from, 'tagall', mensaje, { mentions });
 
     } catch (error) {
-        console.error('[ERROR TAGALL]', error);
+        logger.debug('[TAGALL]', error);
         await sendImageWithCaption(client, message.from, 'tagall',
             error('Ocurrió un error al ejecutar el comando.')
         );

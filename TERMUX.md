@@ -111,6 +111,12 @@ Guarda con `Ctrl + O`, `Enter`, y sal con `Ctrl + X`.
 
 > 💡 Sin `GEMINI_API_KEY` el bot funciona, pero `.ia`, `.img` e `.img-ia` no responden.
 
+> 💡 **Control de logs:** puedes ajustar cuánta información ves en la terminal con `LOG_LEVEL` en `.env`:
+> - `silent` → solo errores críticos
+> - `info` → lo importante (por defecto)
+> - `debug` → información para desarrolladores
+> - `trace` → absolutamente todo (incluye logs de Baileys/MySQL)
+
 ### Base de datos MySQL (opcional)
 
 El bot registra los **usuarios** y el **uso de comandos** en MySQL. Esos datos son sensibles (IDs y aliases de las personas que te escriben), así que no conviene tener la base solo en el teléfono.
@@ -145,7 +151,7 @@ mysql -u root < schema.sql            # crea la base bhk_bot y sus tablas
 mysqldump -u root -p bhk_bot > bhk_bot_$(date +%F).sql
 ```
 
-> Si MySQL no está disponible, el bot arranca igual y avisa `[DB] Continuando sin base de datos...` (solo se desactiva el registro).
+> Si MySQL no está disponible, el bot arranca igual y lo indica brevemente en el resumen inicial (solo se desactiva el registro de usuarios/uso).
 
 ## 9. Ejecutar el bot
 
@@ -156,10 +162,21 @@ npm start
 Espera a que aparezca el **código QR** en pantalla:
 
 ```
-╔══════════════════════════════════╗
-║       🤖 BHK-BOT INICIANDO      ║
-╚══════════════════════════════════╝
-📱 ESCANEA ESTE CÓDIGO QR CON WHATSAPP:
+╔══════════════════════════════════════════╗
+║            🤖 BHK-BOT                    ║
+╚══════════════════════════════════════════╝
+
+🖥️ Sistema       Android (Termux)
+🟢 Node          v22.x (compatible)
+🟢 WhatsApp      Disponible
+🟡 Base de datos No configurada (funciones limitadas)
+🟢 IA            Disponible
+🟢 Voz           Google TTS
+🟢 Descargas     Disponible
+
+────────────────────────────────────────────
+
+📱 Esperando escaneo QR...
 ```
 
 1. Abre **WhatsApp** en el mismo teléfono
@@ -228,7 +245,7 @@ npm start
 | Error | Causa | Solución |
 |---|---|---|
 | `ECONNREFUSED` o errores de red | Sin conexión estable | Repite `pkg install` / `npm install` |
-| `[DB] Error al inicializar: connect ECONNREFUSED 127.0.0.1:3306` | MySQL no está corriendo o credenciales mal | Arranca MySQL con `mariadbd &` (sección 8) o revisa las variables `DB_*` del `.env` |
+| La terminal muestra `Base de datos No configurada` en el resumen | MySQL no está corriendo o credenciales mal | Arranca MySQL con `mariadbd &` (sección 8) o revisa las variables `DB_*` del `.env`. Para ver el detalle técnico usa `LOG_LEVEL=debug` |
 | `bash: schema.sql: No such file or directory` | Clon desactualizado (falta `schema.sql`) | `git pull origin main` (sección 11) y repite la importación |
 | Pantalla del QR se ve cortada | Terminal pequeña | Rota el teléfono a horizontal o reduce el tamaño de letra |
 | `Termux` se cierra al instalar | Memoria insuficiente | Cierra apps en segundo plano |

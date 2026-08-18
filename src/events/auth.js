@@ -1,13 +1,13 @@
-let authShown = false;
+const logger = require('../utils/logger');
 
+// La confirmación "✅ Sesión autenticada" la muestra la capa CLI
+// (startup.done) cuando el cliente queda listo.
 function handleAuthenticated() {
-    if (authShown) return;
-    authShown = true;
-    console.log('[AUTH] ✅ Sesión autenticada correctamente');
+    // Sin salida: el estado se refleja en el frame final.
 }
 
 function handleAuthFailure(msg) {
-    console.error('[AUTH] ❌ Error de autenticación:', msg);
+    logger.warn('❌ Error de autenticación:', msg);
 }
 
 module.exports = { handleAuthenticated, handleAuthFailure };

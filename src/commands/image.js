@@ -3,12 +3,16 @@ const path = require('path');
 const { BotMedia } = require('../infrastructure/whatsapp/client');
 const { PREFIXES } = require('../config/constants');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const logger = require('../utils/logger');
+const registry = require('../cli/serviceRegistry');
 const { error, warn, status, build } = require('../config/branding');
 
 const API_KEY = process.env.GEMINI_API_KEY;
 
 if (!API_KEY || API_KEY === 'PEGA-TU-CLAVE-AQUI-BRO') {
-    console.warn('[AI] ⚠️ GEMINI_API_KEY no configurada en .env. Los comandos .img y .img-ia no funcionarán.');
+    registry.setService('gemini', 'optional', 'no configurada', true);
+} else {
+    registry.setService('gemini', 'ok');
 }
 const MODEL = 'gemini-2.0-flash-preview-image-generation';
 
@@ -30,12 +34,14 @@ async function loadSDK() {
     }
 }
 
-function extractPrompt(message, command) {
+function extractPrompt(message) {
     const body = message.body;
     const prefix = PREFIXES.find(p => body.startsWith(p)) || '.';
     const withoutPrefix = body.slice(prefix.length).trim();
-    const prompt = withoutPrefix.slice(command.length).trim();
-    return prompt;
+    const parts = withoutPrefix.split(/\s+/);
+    const command = parts[0]?.toLowerCase() || '';
+    const prompt = parts.slice(1).join(' ').trim();
+    return { command, prompt };
 }
 
 async function generateImageWithGemini(prompt, attachedImage) {
@@ -103,7 +109,7 @@ function saveTempImage(imageData, mimeType) {
 
 async function generateImage(client, message) {
     try {
-        const prompt = extractPrompt(message, 'img');
+        const { prompt } = extractPrompt(message);
 
         if (!prompt) {
             await sendImageWithCaption(client, message.from, 'img',
@@ -131,7 +137,7 @@ async function generateImage(client, message) {
         fs.unlinkSync(rutaArchivo);
 
     } catch (error) {
-        console.error('[ERROR IMAGEN]', error);
+        logger.debug('[IMAGEN]', error);
 
         if (error.message && error.message.includes('@google/genai')) {
             await sendImageWithCaption(client, message.from, 'img', error('Falta instalar @google/genai. Ejecuta: npm install @google/genai'));
@@ -151,11 +157,11 @@ async function generateImage(client, message) {
 
 async function generateImageAI(client, message) {
     try {
-        const prompt = extractPrompt(message, 'img-ia');
+        const { prompt } = extractPrompt(message);
 
         if (!prompt) {
             await sendImageWithCaption(client, message.from, 'img-ia',
-                error('Debes escribir una descripción.\nEjemplo: .img-ia haz esto más colorido (con una imagen adjunta)')
+                error('Debes escribir una descripción.\nEjemplo: .editar haz esto más colorido (con una imagen adjunta)')
             );
             return;
         }
@@ -191,7 +197,7 @@ async function generateImageAI(client, message) {
         fs.unlinkSync(rutaArchivo);
 
     } catch (error) {
-        console.error('[ERROR IMAGEN-IA]', error);
+        logger.debug('[IMAGEN-IA]', error);
 
         if (error.message && error.message.includes('@google/genai')) {
             await sendImageWithCaption(client, message.from, 'img-ia', error('Falta instalar @google/genai. Ejecuta: npm install @google/genai'));
@@ -205,3 +211,4 @@ async function generateImageAI(client, message) {
 }
 
 module.exports = { generateImage, generateImageAI };
+

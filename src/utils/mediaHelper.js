@@ -1,5 +1,6 @@
 const path = require('path');
 const { BotMedia } = require('../infrastructure/whatsapp/client');
+const logger = require('./logger');
 
 const IMAGENES_DIR = path.join(__dirname, '..', 'media', 'imagen');
 
@@ -34,9 +35,10 @@ async function sendImageWithCaption(client, chatId, command, caption, options = 
         const media = BotMedia.fromFilePath(imagePath);
         return client.sendMedia(chatId, media, { caption, ...options });
     } catch (error) {
-        console.error(`[MEDIA] Error sending image for ${command}:`, error);
+        logger.debug(`[MEDIA] Error sending image for ${command}:`, error);
         return client.sendText(chatId, caption, options);
     }
 }
 
 module.exports = { sendImageWithCaption, getImagePath, COMMAND_IMAGES };
+

@@ -1,5 +1,6 @@
 const { BotMedia } = require('../infrastructure/whatsapp/client');
 const fs = require('fs');
+const logger = require('../utils/logger');
 const { build, creditLine } = require('../config/branding');
 
 function formatDuration(segundos) {
@@ -31,7 +32,7 @@ async function sendTikTokVideo(client, message, data) {
 
         await client.sendMedia(message.from, media, { caption });
     } catch (error) {
-        console.error('[ERROR sendTikTokVideo]', error);
+        logger.debug('[TIKTOK-VIDEO]', error);
         throw error;
     }
 }

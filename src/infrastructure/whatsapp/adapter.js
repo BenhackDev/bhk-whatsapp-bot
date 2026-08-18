@@ -1,20 +1,25 @@
 const { default: makeWASocket } = require('@whiskeysockets/baileys');
 const { loadSession, clearSession } = require('./session');
 const { wireEvents, normalizeJid } = require('./events');
+const logger = require('../../utils/logger');
 
 const BASE_RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_DELAY = 30000;
 const MESSAGE_CACHE_LIMIT = 500;
 
+/**
+ * Logger compatible con Baileys. En modo INFO no produce ruido.
+ * Todo el detalle interno de Baileys se enruta a DEBUG/TRACE.
+ */
 const SILENT_LOGGER = {
     level: 'silent',
     child: () => SILENT_LOGGER,
-    trace: () => {},
-    debug: () => {},
+    trace: (...args) => logger.trace('[BAILEYS]', ...args),
+    debug: (...args) => logger.debug('[BAILEYS]', ...args),
     info: () => {},
-    warn: () => {},
-    error: (...args) => console.error('[BAILEYS]', ...args),
-    fatal: (...args) => console.error('[BAILEYS]', ...args)
+    warn: (...args) => logger.debug('[BAILEYS]', ...args),
+    error: (...args) => logger.debug('[BAILEYS]', ...args),
+    fatal: (...args) => logger.debug('[BAILEYS]', ...args)
 };
 
 function toBaileysJid(chatId) {
@@ -93,7 +98,8 @@ class BaileysAdapter {
 
         this.reconnectTimer = setTimeout(() => {
             this.connect().catch((error) => {
-                console.error('[BOT] Error al reconectar:', error.message);
+                logger.once('reconnect.failed', () => logger.warn('🔄 Reconectando WhatsApp...'));
+                logger.debug('[BOT] Error al reconectar:', error.message);
                 this.scheduleReconnect();
             });
         }, delay);

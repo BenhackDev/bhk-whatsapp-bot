@@ -1,4 +1,6 @@
 const mysql = require('mysql2/promise');
+const logger = require('../utils/logger');
+const registry = require('../cli/serviceRegistry');
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
@@ -10,6 +12,12 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 });
+
+let dbStatus = 'connecting'; // 'connected' | 'unconfigured' | 'connecting'
+
+function getDatabaseStatus() {
+    return dbStatus;
+}
 
 async function initializeDatabase() {
     try {
@@ -30,11 +38,13 @@ async function initializeDatabase() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log('[DB] Tablas verificadas/creadas correctamente');
+        dbStatus = 'connected';
+        registry.setService('database', 'ok');
     } catch (error) {
-        console.error('[DB] Error al inicializar:', error.message);
-        console.log('[DB] Continuando sin base de datos...');
+        dbStatus = 'unconfigured';
+        logger.debug('[DB] No se pudo conectar a la base de datos:', error.message);
+        registry.setService('database', 'optional', 'funciones limitadas', true);
     }
 }
 
-module.exports = { pool, initializeDatabase };
+module.exports = { pool, initializeDatabase, getDatabaseStatus };

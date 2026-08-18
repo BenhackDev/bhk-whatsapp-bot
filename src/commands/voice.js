@@ -4,10 +4,19 @@ const path = require('path');
 const { execSync } = require('child_process');
 const { BotMedia } = require('../infrastructure/whatsapp/client');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
+const logger = require('../utils/logger');
+const registry = require('../cli/serviceRegistry');
 const { error, status } = require('../config/branding');
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const VOICE_ID = 'EkK5I93UQWFDigLMpZcX';
+
+if (ELEVENLABS_API_KEY) {
+    registry.setService('elevenlabs', 'ok');
+} else {
+    registry.setService('elevenlabs', 'optional', 'opcional', true);
+}
+registry.setService('google_tts', 'ok');
 
 function convertToOpus(inputPath, outputPath) {
     execSync(
@@ -55,7 +64,7 @@ async function generateAudio(texto) {
             return Buffer.from(response.data);
         } catch (err) {
             if (err.response && (err.response.status === 402 || err.response.status === 401)) {
-                console.log('[VOZ] ElevenLabs sin crédito, usando Google TTS gratuito...');
+                logger.debug('[VOZ] ElevenLabs sin crédito, usando Google TTS gratuito...');
             } else {
                 throw err;
             }
@@ -93,7 +102,7 @@ async function processVoiceCommand(client, message) {
         fs.unlinkSync(mp3Path);
         fs.unlinkSync(oggPath);
     } catch (error) {
-        console.error('[ERROR VOZ]', error);
+        logger.debug('[VOZ]', error);
         await sendImageWithCaption(client, message.from, 'voz', error('Error al generar el audio. Intenta de nuevo.'));
     }
 }

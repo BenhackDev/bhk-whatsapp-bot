@@ -81,6 +81,7 @@ const TITLES = {
     voice: 'Texto a Voz',
     image: 'Imagen IA',
     tiktok: 'TikTok',
+    youtube: 'YouTube',
     tagall: 'Mención Masiva'
 };
 

@@ -1,6 +1,7 @@
 const { parseCommand, getUserId } = require('../utils/commandParser');
 const { routeCommand } = require('../commands/index');
 const { logUsage } = require('../services/usageService');
+const logger = require('../utils/logger');
 
 async function handleMessage(message, client) {
     try {
@@ -13,7 +14,7 @@ async function handleMessage(message, client) {
 
         await logUsage(parsed.command, getUserId(message));
     } catch (error) {
-        console.error('[ERROR] Procesando mensaje:', error);
+        logger.debug('[Message] Error procesando mensaje:', error);
     }
 }
 

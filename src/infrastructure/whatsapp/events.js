@@ -4,6 +4,7 @@ const {
     getContentType
 } = require('@whiskeysockets/baileys');
 const { BotMedia } = require('./media');
+const logger = require('../../utils/logger');
 
 const MEDIA_MESSAGE_TYPES = [
     'imageMessage',
@@ -13,10 +14,15 @@ const MEDIA_MESSAGE_TYPES = [
     'stickerMessage'
 ];
 
+/**
+ * Logger usado por `downloadMediaMessage`. Todo el detalle interno
+ * se enruta a DEBUG/TRACE; en INFO no produce spam.
+ */
 const BAILEYS_LOGGER = {
-    log: (...args) => console.log('[BAILEYS]', ...args),
-    info: (...args) => console.log('[BAILEYS]', ...args),
-    error: (...args) => console.error('[BAILEYS]', ...args)
+    log: (...args) => logger.trace('[BAILEYS][media]', ...args),
+    info: (...args) => logger.debug('[BAILEYS][media]', ...args),
+    warn: (...args) => logger.debug('[BAILEYS][media]', ...args),
+    error: (...args) => logger.debug('[BAILEYS][media]', ...args)
 };
 
 function normalizeJid(jid) {

@@ -56,7 +56,7 @@ ffmpeg -version        # ¿responde?
 
 ### `.voz` → falla con ElevenLabs configurada
 - Sin crédito (402/401): el bot cae automáticamente a Google TTS — es normal
-- Otros errores: revisa el log `[ERROR VOZ]` en consola
+- Otros errores: revisa la consola con `LOG_LEVEL=debug` para ver el detalle técnico
 
 ### `.ia` → "Límite de la cuota gratuita de Gemini excedido"
 Espera un minuto (el bot reintenta 2 veces automáticamente) o genera una API key nueva en https://aistudio.google.com/apikey.
@@ -87,12 +87,14 @@ Espera un minuto (el bot reintenta 2 veces automáticamente) o genera una API ke
 
 ## Errores de base de datos
 
-### `[DB] Continuando sin base de datos...`
-El bot arranca igual. Para activar MySQL:
+### La terminal muestra `Base de datos No configurada` en el resumen
+El bot arranca igual (solo se desactiva el registro de usuarios/uso). Para activar MySQL:
 1. Instala/levanta MySQL
 2. Crea la base: `CREATE DATABASE bhk_bot;`
 3. Configura `DB_USER` / `DB_PASSWORD` en `.env`
 4. Reinicia el bot (las tablas se crean solas)
+
+> 💡 Para ver el detalle técnico de la conexión (errores MySQL, etc.), usa `LOG_LEVEL=debug` en `.env`. En `info` (por defecto) solo se muestra el estado del resumen.
 
 ### `ER_ACCESS_DENIED_ERROR`
 Credenciales incorrectas en `.env`. Verifica `DB_USER`, `DB_PASSWORD` y permisos del usuario.
