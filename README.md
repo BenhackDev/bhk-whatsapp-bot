@@ -381,6 +381,7 @@ Cuando el bot conecta:
 
 ### 🎥 Tutoriales en YouTube
 
+- 📚 **Serie completa: Crea tu Bot de WhatsApp desde cero**: [Ver playlist en YouTube](https://www.youtube.com/playlist?list=PLBYeh3dqLycyd6XcpFnyranxQR-d3r1jT)
 - 🧠 **API de Gemini (`.ia`, `.img`, `.editar`)**: [Cómo usar la API de Gemini en el bot](https://youtu.be/pbpr5LwZgQ0)
 
 ## 📜 Scripts disponibles
@@ -551,7 +552,7 @@ Este proyecto está bajo la licencia **MIT** — ver [LICENSE](LICENSE) para má
 
 | Recurso | Enlace |
 |---|---|
-| 🎥 YouTube (serie completa) | [@Tutos_benhack](https://www.youtube.com/@Tutos_benhack) |
+| 🎥 YouTube (serie completa) | [Playlist: Crea tu Bot desde cero](https://www.youtube.com/playlist?list=PLBYeh3dqLycyd6XcpFnyranxQR-d3r1jT) |
 | 🎵 TikTok (tips y novedades) | [@benhackdev](https://www.tiktok.com/@benhackdev) |
 | 🐛 Issues | [Issues del repositorio](https://github.com/BenhackDev/bhk-whatsapp-bot/issues) |
 | 💬 Discusiones | [Discussions](https://github.com/BenhackDev/bhk-whatsapp-bot/discussions) |
