@@ -45,7 +45,7 @@ cd bhk-whatsapp-bot
 3. Agrega el repositorio original como `upstream`:
 
 ```bash
-git remote add upstream https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git remote add upstream https://github.com/BenhackDev/bhk-whatsapp-bot.git
 ```
 
 4. Instala las dependencias:
@@ -197,6 +197,6 @@ Usa el template de issues. Describe:
 
 <div align="center">
 
-**¿Dudas?** Abre un [issue](https://github.com/tutosbenhack/bhk-whatsapp-bot/issues) o escríbeme en [YouTube](https://www.youtube.com/@Tutos_benhack). ¡Estaré encantado de ayudarte!
+**¿Dudas?** Abre un [issue](https://github.com/BenhackDev/bhk-whatsapp-bot/issues) o escríbeme en [YouTube](https://www.youtube.com/@Tutos_benhack). ¡Estaré encantado de ayudarte!
 
 </div>

@@ -13,7 +13,7 @@ pkg install -y git nodejs-lts ffmpeg python
 pip install -U yt-dlp
 
 # 2. Clonar e instalar
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 npm install
 

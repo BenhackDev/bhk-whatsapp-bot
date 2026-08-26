@@ -89,7 +89,7 @@ yt-dlp --version
 ### 2.4 Instalar el bot
 
 ```powershell
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 copy .env.example .env
 npm install
@@ -133,7 +133,7 @@ pip3 install -U yt-dlp
 ### 3.4 Instalar y ejecutar el bot
 
 ```bash
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 cp .env.example .env
 npm install
@@ -163,7 +163,7 @@ pip3 install -U yt-dlp        # o: brew install yt-dlp
 ### 4.3 Instalar y ejecutar el bot
 
 ```bash
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 cp .env.example .env
 npm install
@@ -181,7 +181,7 @@ npm start
 pkg update && pkg upgrade -y
 pkg install -y git nodejs-lts ffmpeg python
 pip install -U yt-dlp
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 cp .env.example .env
 npm install

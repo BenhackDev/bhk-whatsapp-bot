@@ -103,7 +103,7 @@ git log --oneline -10      # últimos 10
 Copia un repositorio remoto a tu PC:
 
 ```bash
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 ```
 
@@ -112,8 +112,8 @@ Gestiona los repositorios remotos conectados:
 
 ```bash
 git remote -v                                   # ver remotos
-git remote add origin https://github.com/tutosbenhack/bhk-whatsapp-bot.git   # conectar
-git remote set-url origin https://github.com/tutosbenhack/bhk-whatsapp-bot.git  # cambiar URL
+git remote add origin https://github.com/BenhackDev/bhk-whatsapp-bot.git   # conectar
+git remote set-url origin https://github.com/BenhackDev/bhk-whatsapp-bot.git  # cambiar URL
 git remote remove origin                        # desconectar
 ```
 
@@ -222,9 +222,9 @@ whatsapp-bot · nodejs · gemini · baileys · javascript · chatgpt-alternative
 El README ya incluye badges estáticos. Al publicar el repo puedes añadir los automáticos:
 
 ```markdown
-[![Stars](https://img.shields.io/github/stars/tutosbenhack/bhk-whatsapp-bot?style=for-the-badge)]
-[![Forks](https://img.shields.io/github/forks/tutosbenhack/bhk-whatsapp-bot?style=for-the-badge)]
-[![Issues](https://img.shields.io/github/issues/tutosbenhack/bhk-whatsapp-bot?style=for-the-badge)]
+[![Stars](https://img.shields.io/github/stars/BenhackDev/bhk-whatsapp-bot?style=for-the-badge)]
+[![Forks](https://img.shields.io/github/forks/BenhackDev/bhk-whatsapp-bot?style=for-the-badge)]
+[![Issues](https://img.shields.io/github/issues/BenhackDev/bhk-whatsapp-bot?style=for-the-badge)]
 ```
 
 ### Releases

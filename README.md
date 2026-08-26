@@ -152,7 +152,7 @@ El bot funciona **sin navegador** (Baileys): no necesita Chrome, Chromium ni Pup
 ### ⚡ Instalación rápida (funciona en todas las plataformas)
 
 ```bash
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 npm install
 ```
@@ -166,7 +166,7 @@ npm install
 2. **Clona el repositorio e instala dependencias:**
 
    ```bash
-   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
    cd bhk-whatsapp-bot
    npm install
    ```
@@ -204,7 +204,7 @@ npm install
 2. **Clona el repositorio e instala dependencias:**
 
    ```bash
-   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
    cd bhk-whatsapp-bot
    npm install
    ```
@@ -246,7 +246,7 @@ npm install
 3. **Clona el repositorio e instala dependencias:**
 
    ```bash
-   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
    cd bhk-whatsapp-bot
    npm install
    ```
@@ -280,7 +280,7 @@ npm install
 2. **Clona e instala:**
 
    ```bash
-   git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+   git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
    cd bhk-whatsapp-bot
    npm install
    ```
@@ -529,8 +529,8 @@ Lee la guía completa en [CONTRIBUTING.md](CONTRIBUTING.md). Al contribuir, acep
 
 ## 🐛 Reportar bugs y solicitar funciones
 
-- **Bugs:** abre un [issue](https://github.com/tutosbenhack/bhk-whatsapp-bot/issues) con el template "Reportar bug"
-- **Funciones:** abre un [issue](https://github.com/tutosbenhack/bhk-whatsapp-bot/issues) con el template "Solicitar función"
+- **Bugs:** abre un [issue](https://github.com/BenhackDev/bhk-whatsapp-bot/issues) con el template "Reportar bug"
+- **Funciones:** abre un [issue](https://github.com/BenhackDev/bhk-whatsapp-bot/issues) con el template "Solicitar función"
 - **Seguridad:** NO abras issues públicos — sigue [SECURITY.md](SECURITY.md)
 
 ## 📄 Licencia
@@ -549,8 +549,8 @@ Este proyecto está bajo la licencia **MIT** — ver [LICENSE](LICENSE) para má
 |---|---|
 | 🎥 YouTube (serie completa) | [@Tutos_benhack](https://www.youtube.com/@Tutos_benhack) |
 | 🎵 TikTok (tips y novedades) | [@tutosbenhack](https://www.tiktok.com/@tutosbenhack) |
-| 🐛 Issues | [Issues del repositorio](https://github.com/tutosbenhack/bhk-whatsapp-bot/issues) |
-| 💬 Discusiones | [Discussions](https://github.com/tutosbenhack/bhk-whatsapp-bot/discussions) |
+| 🐛 Issues | [Issues del repositorio](https://github.com/BenhackDev/bhk-whatsapp-bot/issues) |
+| 💬 Discusiones | [Discussions](https://github.com/BenhackDev/bhk-whatsapp-bot/discussions) |
 
 **Reglas de convivencia:** sé amable, respeta a los demás y no uses el proyecto para spam ni actividades ilegales. Lee el [Código de Conducta](CODE_OF_CONDUCT.md).
 

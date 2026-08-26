@@ -82,7 +82,7 @@ yt-dlp --version
 
 ```bash
 cd ~
-git clone https://github.com/tutosbenhack/bhk-whatsapp-bot.git
+git clone https://github.com/BenhackDev/bhk-whatsapp-bot.git
 cd bhk-whatsapp-bot
 ```
 
