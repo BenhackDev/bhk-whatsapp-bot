@@ -322,7 +322,7 @@ Toda la configuración vive en el archivo `.env` (ver [.env.example](.env.exampl
 | `BOT_NAME` | ❌ | Nombre del bot (firma de todos los mensajes) | `BHK-Bot` |
 | `CREATOR_NAME` | ❌ | Nombre del creador que aparece en la firma | `Tutos Benhack` |
 | `CREATOR_YOUTUBE` | ❌ | Canal de YouTube del creador | `https://www.youtube.com/@Tutos_benhack` |
-| `CREATOR_TIKTOK` | ❌ | TikTok del creador | `https://www.tiktok.com/@tutosbenhack` |
+| `CREATOR_TIKTOK` | ❌ | TikTok del creador | `https://www.tiktok.com/@benhackdev` |
 | `CREATOR_GITHUB` | ❌ | GitHub del creador | `https://github.com/tutosbenhack` |
 
 > 💡 Si no configuras MySQL, el bot **funciona igual**: solo se desactivan el registro de usuarios y las estadísticas de uso.
@@ -552,7 +552,7 @@ Este proyecto está bajo la licencia **MIT** — ver [LICENSE](LICENSE) para má
 | Recurso | Enlace |
 |---|---|
 | 🎥 YouTube (serie completa) | [@Tutos_benhack](https://www.youtube.com/@Tutos_benhack) |
-| 🎵 TikTok (tips y novedades) | [@tutosbenhack](https://www.tiktok.com/@tutosbenhack) |
+| 🎵 TikTok (tips y novedades) | [@benhackdev](https://www.tiktok.com/@benhackdev) |
 | 🐛 Issues | [Issues del repositorio](https://github.com/BenhackDev/bhk-whatsapp-bot/issues) |
 | 💬 Discusiones | [Discussions](https://github.com/BenhackDev/bhk-whatsapp-bot/discussions) |
 
@@ -561,7 +561,7 @@ Este proyecto está bajo la licencia **MIT** — ver [LICENSE](LICENSE) para má
 ## ☕ Apoya el proyecto
 
 - Suscríbete y deja tu like en el [canal de YouTube](https://www.youtube.com/@Tutos_benhack) 🔔
-- Sígueme en [TikTok](https://www.tiktok.com/@tutosbenhack)
+- Sígueme en [TikTok](https://www.tiktok.com/@benhackdev)
 - ⭐ Dale una estrella a este repositorio
 - Comparte el proyecto con tu comunidad
 

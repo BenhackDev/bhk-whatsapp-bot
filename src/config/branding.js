@@ -6,7 +6,7 @@ const BOT_EMOJI = '🤖';
 const CREATOR = {
     name: process.env.CREATOR_NAME || 'Tutos Benhack',
     youtube: process.env.CREATOR_YOUTUBE || 'https://www.youtube.com/@Tutos_benhack',
-    tiktok: process.env.CREATOR_TIKTOK || 'https://www.tiktok.com/@tutosbenhack',
+    tiktok: process.env.CREATOR_TIKTOK || 'https://www.tiktok.com/@benhackdev',
     github: process.env.CREATOR_GITHUB || 'https://github.com/tutosbenhack'
 };
 
