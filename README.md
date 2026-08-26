@@ -379,6 +379,10 @@ Cuando el bot conecta:
 
 > Todos los comandos funcionan con **cualquier prefijo** configurado: `.menu`, `#menu`, `/menu`, `$menu`, `!menu`, `%menu`.
 
+### 🎥 Tutoriales en YouTube
+
+- 🧠 **API de Gemini (`.ia`, `.img`, `.editar`)**: [Cómo usar la API de Gemini en el bot](https://youtu.be/pbpr5LwZgQ0)
+
 ## 📜 Scripts disponibles
 
 | Script | Comando | Descripción |
