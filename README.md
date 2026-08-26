@@ -27,6 +27,22 @@
 
 ---
 
+## 📺 ¿Prefieres verlo en video?
+
+<div align="center">
+
+**Mira la guía de instalación paso a paso en YouTube 👇**
+
+### 🎥 Instala tu BOT de WhatsApp en ANDROID (Termux) SIN ROOT 2026
+
+[![Instala tu BOT de WhatsApp en ANDROID (Termux) SIN ROOT 2026](https://img.youtube.com/vi/WSd8CuQr4aw/maxresdefault.jpg)](https://youtu.be/WSd8CuQr4aw)
+
+🔗 **https://youtu.be/WSd8CuQr4aw**
+
+</div>
+
+---
+
 </div>
 
 ## ✨ ¿Qué es BHK WhatsApp Bot?
@@ -45,6 +61,7 @@ Es un proyecto **Open Source**, creado para la comunidad, y el protagonista de u
 | `🖼️ .img <descripción>` | Genera **imágenes con IA** desde texto |
 | `🖼️ .editar <prompt>` + foto | **Edita/transforma una imagen adjunta** con IA (alias: `.img-ia`) |
 | `🎬 .tiktok <url>` / `.tk <url>` | **Descarga videos de TikTok** (título, autor y hashtags incluidos) |
+| `🎬 .yt <url>` | **Descarga videos de YouTube** en 360p (máx. 10 min / 50 MB) |
 | `🗣️ .voz <texto>` | Convierte texto a **voz** (nota de audio) con ElevenLabs o TTS de Google |
 | `👥 .tagall` | Menciona a **todos los miembros** de un grupo (solo admins) |
 | `📋 .menu` / `.ayuda` | Muestra el menú interactivo del bot |
