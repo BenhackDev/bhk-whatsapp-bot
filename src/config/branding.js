@@ -221,6 +221,7 @@ function creatorCard() {
     return build(
         [
             { icon: '👋', label: `¡Hola! Soy ${BOT_NAME}`, desc: 'Asistente de WhatsApp con IA, listo para ayudarte.' },
+            { icon: '⭐', label: 'Apoya el proyecto', desc: 'Déjanos una estrella en GitHub:\nhttps://github.com/BenhackDev/bhk-whatsapp-bot' },
             { icon: '🏆', label: 'Proyecto', desc: '100% open source, hecho con 💚 para la comunidad.' }
         ],
         { type: 'creator', withSignature: true }

@@ -19,6 +19,10 @@
 
 # 🤖 BHK WhatsApp Bot
 
+[![GitHub stars](https://img.shields.io/github/stars/BenhackDev/bhk-whatsapp-bot?style=social)](https://github.com/BenhackDev/bhk-whatsapp-bot/stargazers)
+
+> ⭐ **¡Si este bot te sirve o estás aprendiendo con él, dale una Estrella arriba a la derecha!** Es un clic gratis para ti, pero me motiva muchísimo a seguir creando tutoriales y actualizaciones. ¡Gracias! 💚
+
 ### Bot de WhatsApp con Inteligencia Artificial, imágenes IA, descarga de TikTok, texto a voz y más — 100% Open Source
 
 **Aprende a construir este bot paso a paso en [YouTube](https://www.youtube.com/@Tutos_benhack) 🎥**
