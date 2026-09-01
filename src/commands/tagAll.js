@@ -60,9 +60,11 @@ async function executeTagAll(client, message) {
             index++;
         }
 
+        logger.info('[TAGALL] JIDs completos:', mentions.join(', '));
+
         logger.info('[TAGALL] Menciones generadas:', mentions.length);
         if (mentions.length > 0) {
-            logger.info('[TAGALL] Primeros 3 JIDs:', mentions.slice(0, 3).join(', '));
+            logger.info('[TAGALL] Primeros 3 participantes RAW:', JSON.stringify(chat.participants.slice(0, 3)));
         }
 
         const header = `*👥 Miembros del grupo (${lines.length})*\n`;

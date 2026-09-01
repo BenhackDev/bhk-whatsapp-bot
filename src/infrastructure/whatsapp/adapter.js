@@ -128,6 +128,9 @@ class BaileysAdapter {
     async sendMedia(chatId, media, options = {}) {
         const buffer = media.toBuffer();
         const type = options.type || resolveMediaType(media.mimetype);
+        const mentions = (options.mentions || []).map((m) =>
+            m.endsWith('@c.us') ? m.replace('@c.us', '@s.whatsapp.net') : m
+        );
         let content;
 
         switch (type) {
@@ -156,7 +159,12 @@ class BaileysAdapter {
                 };
         }
 
-        await this.sock.sendMessage(toBaileysJid(chatId), content);
+        const msgOptions = {};
+        if (mentions.length > 0) {
+            msgOptions.mentions = mentions;
+        }
+
+        await this.sock.sendMessage(toBaileysJid(chatId), content, msgOptions);
     }
 
     async getGroupMetadata(chatId) {

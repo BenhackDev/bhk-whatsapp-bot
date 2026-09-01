@@ -48,20 +48,36 @@ function isValidYouTubeUrl(url) {
 
 async function getMetadata(ytDlpPath, url) {
     const cmd = `"${ytDlpPath}" --dump-json --no-playlist --no-warnings "${url}"`;
-    const { stdout } = await execPromise(cmd, { timeout: 30000 });
-    return JSON.parse(stdout);
+    try {
+        const { stdout } = await execPromise(cmd, { timeout: 30000 });
+        return JSON.parse(stdout);
+    } catch (e) {
+        const stderr = e.stderr || '';
+        const stdout = e.stdout || '';
+        if (stderr) logger.error('[YT] yt-dlp stderr:', stderr.slice(0, 500));
+        if (stdout) logger.error('[YT] yt-dlp stdout:', stdout.slice(0, 500));
+        throw e;
+    }
 }
 
 async function downloadVideo(ytDlpPath, url, tempDir) {
     const idUnico = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const plantillaSalida = path.join(tempDir, `yt_${idUnico}_%(id)s.%(ext)s`);
 
-    await execPromise(
-        `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate ` +
-        `-f "best[height<=360][ext=mp4]/best[height<=360]/best[ext=mp4]/best" ` +
-        `--merge-output-format mp4 "${url}"`,
-        { timeout: 120000 }
-    );
+    try {
+        await execPromise(
+            `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate ` +
+            `-f "best[height<=360][ext=mp4]/best[height<=360]/best[ext=mp4]/best" ` +
+            `--merge-output-format mp4 "${url}"`,
+            { timeout: 120000 }
+        );
+    } catch (e) {
+        const stderr = e.stderr || '';
+        const stdout = e.stdout || '';
+        if (stderr) logger.error('[YT] yt-dlp stderr:', stderr.slice(0, 500));
+        if (stdout) logger.error('[YT] yt-dlp stdout:', stdout.slice(0, 500));
+        throw e;
+    }
 
     const archivos = fs.readdirSync(tempDir)
         .filter(f => f.startsWith(`yt_${idUnico}_`))
