@@ -67,15 +67,14 @@ async function downloadVideo(ytDlpPath, url, tempDir) {
     try {
         await execPromise(
             `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate ` +
+            `--extractor-args "youtube:player_client=web,mweb" ` +
             `-f "best[height<=360][ext=mp4]/best[height<=360]/best[ext=mp4]/best" ` +
             `--merge-output-format mp4 "${url}"`,
             { timeout: 120000 }
         );
     } catch (e) {
         const stderr = e.stderr || '';
-        const stdout = e.stdout || '';
         if (stderr) logger.error('[YT] yt-dlp stderr:', stderr.slice(0, 500));
-        if (stdout) logger.error('[YT] yt-dlp stdout:', stdout.slice(0, 500));
         throw e;
     }
 
