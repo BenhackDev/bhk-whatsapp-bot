@@ -31,7 +31,7 @@ async function showMenu(client, message, userId) {
         ],
         {
             type: 'menu',
-            notes: [tip('Escribe el comando con cualquier prefijo: . # / $ ! %')],
+            notes: [tip('Escribe el comando con el prefijo: .menu')],
             withSignature: true
         }
     );
