@@ -32,16 +32,16 @@ function isValidTikTokUrl(url) {
 }
 
 async function getVideoFromApi(url) {
-    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+    const apiUrl = `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`;
     logger.info('[TIKTOK] Consultando API:', apiUrl);
     
     const response = await axios.get(apiUrl, { timeout: 30000 });
     
-    if (response.data.code !== 0) {
-        throw new Error(response.data.msg || 'La API no pudo procesar el video');
+    if (response.data.status !== 200 || !response.data.result) {
+        throw new Error(response.data.message || 'La API no pudo procesar el video');
     }
     
-    return response.data.data;
+    return response.data.result;
 }
 
 async function processTikTokCommand(client, message) {
@@ -66,10 +66,9 @@ async function processTikTokCommand(client, message) {
         logger.info('[TIKTOK] Obteniendo video desde API...');
         const videoData = await getVideoFromApi(url);
         
-        const videoUrl = videoData.play;
+        const videoUrl = videoData.video?.no_watermark || videoData.video?.watermark;
         const title = videoData.title || 'Video de TikTok';
         const author = videoData.author?.nickname || 'Desconocido';
-        const duration = videoData.duration || 0;
 
         logger.info('[TIKTOK] Título:', title, '- Autor:', author);
 
@@ -101,7 +100,7 @@ async function processTikTokCommand(client, message) {
 
         const datosVideo = {
             title: title,
-            duration: duration,
+            duration: 0,
             hashtags: [],
             uploader: author,
             filePath: filePath
