@@ -11,20 +11,26 @@ const execPromise = util.promisify(exec);
 const { PREFIXES } = require('../config/constants');
 
 const YTDLP_PATHS = [
+    'yt-dlp',
+    'yt-dlp.exe',
     path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python312', 'Scripts', 'yt-dlp.exe'),
     path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python313', 'Scripts', 'yt-dlp.exe'),
     path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python311', 'Scripts', 'yt-dlp.exe'),
-    'yt-dlp',
-    'C:\\ProgramData\\chocolatey\\bin\\yt-dlp.exe'
+    'C:\\ProgramData\\chocolatey\\bin\\yt-dlp.exe',
+    '/data/data/com.termux/files/usr/bin/yt-dlp',
+    path.join(process.env.HOME || '', '.local', 'bin', 'yt-dlp')
 ];
 
 function findYtDlp() {
     for (const p of YTDLP_PATHS) {
         try {
-            require('child_process').execSync(`"${p}" --version`, { timeout: 5000, stdio: 'pipe' });
+            const result = require('child_process').execSync(`"${p}" --version`, { timeout: 5000, stdio: 'pipe' });
+            const version = result.toString().trim();
+            logger.info('[TIKTOK] yt-dlp encontrado en:', p, '- Versión:', version);
             return p;
         } catch (e) { }
     }
+    logger.warn('[TIKTOK] No se encontró yt-dlp en ninguna ruta conocida');
     return null;
 }
 
@@ -61,18 +67,30 @@ async function checkYtDlp() {
 
 async function getMetadata(url) {
     const cmd = `"${ytDlpPath}" --dump-json --no-playlist --no-warnings "${url}"`;
-    const { stdout } = await execPromise(cmd, { timeout: 30000 });
-    return JSON.parse(stdout);
+    logger.info('[TIKTOK] Ejecutando:', cmd);
+    try {
+        const { stdout } = await execPromise(cmd, { timeout: 30000 });
+        return JSON.parse(stdout);
+    } catch (e) {
+        logger.error('[TIKTOK] Error obteniendo metadata:', e.stderr || e.message);
+        throw e;
+    }
 }
 
 async function downloadVideo(url, tempDir) {
     const idUnico = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const plantillaSalida = path.join(tempDir, `tiktok_${idUnico}_%(id)s.%(ext)s`);
-
-    await execPromise(
-        `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate "${url}"`,
-        { timeout: 120000 }
-    );
+    const cmd = `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate "${url}"`;
+    
+    logger.info('[TIKTOK] Ejecutando:', cmd);
+    
+    try {
+        const { stdout, stderr } = await execPromise(cmd, { timeout: 120000 });
+        if (stderr) logger.warn('[TIKTOK] yt-dlp stderr:', stderr.slice(0, 500));
+    } catch (e) {
+        logger.error('[TIKTOK] Error en descarga:', e.stderr || e.message);
+        throw e;
+    }
 
     const archivos = fs.readdirSync(tempDir)
         .filter(f => f.startsWith(`tiktok_${idUnico}_`))
@@ -82,6 +100,7 @@ async function downloadVideo(url, tempDir) {
         throw new Error('No se encontró el archivo descargado.');
     }
 
+    logger.info('[TIKTOK] Archivo encontrado:', archivos[0]);
     return archivos[0];
 }
 

@@ -18,20 +18,26 @@ const MAX_DURACION_SEGUNDOS = 600;
 const MAX_TAMANO_BYTES = 50 * 1024 * 1024;
 
 const YTDLP_PATHS = [
+    'yt-dlp',
+    'yt-dlp.exe',
     path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python312', 'Scripts', 'yt-dlp.exe'),
     path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python313', 'Scripts', 'yt-dlp.exe'),
     path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python311', 'Scripts', 'yt-dlp.exe'),
-    'yt-dlp',
-    'C:\\ProgramData\\chocolatey\\bin\\yt-dlp.exe'
+    'C:\\ProgramData\\chocolatey\\bin\\yt-dlp.exe',
+    '/data/data/com.termux/files/usr/bin/yt-dlp',
+    path.join(process.env.HOME || '', '.local', 'bin', 'yt-dlp')
 ];
 
 function findYtDlp() {
     for (const p of YTDLP_PATHS) {
         try {
-            require('child_process').execSync(`"${p}" --version`, { timeout: 5000, stdio: 'pipe' });
+            const result = require('child_process').execSync(`"${p}" --version`, { timeout: 5000, stdio: 'pipe' });
+            const version = result.toString().trim();
+            logger.info('[YT] yt-dlp encontrado en:', p, '- Versión:', version);
             return p;
         } catch (e) { }
     }
+    logger.warn('[YT] No se encontró yt-dlp en ninguna ruta conocida');
     return null;
 }
 
