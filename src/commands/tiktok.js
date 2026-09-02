@@ -89,15 +89,19 @@ async function processTikTokCommand(client, message) {
     let filePath = null;
 
     try {
+        logger.info('[TIKTOK] Buscando yt-dlp...');
         const ytDlpInstalado = await checkYtDlp();
         if (!ytDlpInstalado) {
+            logger.warn('[TIKTOK] yt-dlp no encontrado en el sistema');
             await sendImageWithCaption(client, message.from, 'tiktok',
                 error('yt-dlp no está instalado.\nDescárgalo desde: https://github.com/yt-dlp/yt-dlp/releases\ny agrégalo al PATH de Windows.')
             );
             return;
         }
+        logger.info('[TIKTOK] yt-dlp encontrado:', ytDlpPath);
 
         const url = extractUrl(message);
+        logger.info('[TIKTOK] URL extraída:', url);
 
         if (!url) {
             await sendImageWithCaption(client, message.from, 'tiktok',
@@ -113,14 +117,18 @@ async function processTikTokCommand(client, message) {
 
         await message.reply(status('⏳ Descargando video de TikTok... esto puede tomar un momento.'));
 
+        logger.info('[TIKTOK] Obteniendo metadata...');
         const metadata = await getMetadata(url);
+        logger.info('[TIKTOK] Título:', metadata.title, '- Duración:', metadata.duration, 'segundos');
 
         const tempDir = path.join(__dirname, '..', '..', 'temp');
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
         }
 
+        logger.info('[TIKTOK] Iniciando descarga...');
         filePath = await downloadVideo(url, tempDir);
+        logger.info('[TIKTOK] Descarga completa:', filePath);
 
         const datosVideo = {
             title: metadata.title || 'Sin título',
@@ -131,27 +139,26 @@ async function processTikTokCommand(client, message) {
         };
 
         await sendTikTokVideo(client, message, datosVideo);
+        logger.info('[TIKTOK] Video enviado OK');
 
         if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
 
-    } catch (error) {
-        logger.debug('[TIKTOK]', error);
+    } catch (err) {
+        logger.error('[TIKTOK] Error:', err.message);
+        logger.error('[TIKTOK] Stack:', err.stack);
 
-        if (error.message && error.message.includes('yt-dlp')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', error('Error al ejecutar yt-dlp. Verifica que esté correctamente instalado.'));
-        } else if (error.message && error.message.includes('HTTP Error 403')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', error('TikTok bloqueó la descarga. Intenta con otro video.'));
-        } else if (error.message && error.message.includes('URL no es válida')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', error('La URL proporcionada no es válida.'));
-        } else if (error.stderr && error.stderr.includes('does not pass filter')) {
-            await sendImageWithCaption(client, message.from, 'tiktok', error('No se pudo descargar el video. Es posible que sea privado o esté eliminado.'));
-        } else {
-            await sendImageWithCaption(client, message.from, 'tiktok',
-                warn('Ocurrió un error al descargar el video.')
-            );
+        let msg = 'No se pudo descargar el video de TikTok.\nPuede ser privado, estar restringido o haber sido eliminado.';
+        if (err.message && err.message.includes('yt-dlp')) {
+            msg = 'Error al ejecutar yt-dlp. Verifica que esté correctamente instalado.';
+        } else if (err.message && err.message.includes('HTTP Error 403')) {
+            msg = 'TikTok bloqueó la descarga. Intenta con otro video.';
+        } else if (err.stderr && err.stderr.includes('does not pass filter')) {
+            msg = 'No se pudo descargar el video. Es posible que sea privado o esté eliminado.';
         }
+
+        await sendImageWithCaption(client, message.from, 'tiktok', warn(msg));
 
         if (filePath && fs.existsSync(filePath)) {
             try { fs.unlinkSync(filePath); } catch (e) {}
