@@ -1,4 +1,6 @@
 const axios = require('axios');
+const { exec } = require('child_process');
+const util = require('util');
 const fs = require('fs');
 const path = require('path');
 const { sendTikTokVideo } = require('./sendTikTokVideo');
@@ -6,6 +8,31 @@ const { sendImageWithCaption } = require('../utils/mediaHelper');
 const logger = require('../utils/logger');
 const { error, warn, status } = require('../config/branding');
 const { PREFIXES } = require('../config/constants');
+
+const execPromise = util.promisify(exec);
+
+const YTDLP_PATHS = [
+    'yt-dlp',
+    'yt-dlp.exe',
+    path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python312', 'Scripts', 'yt-dlp.exe'),
+    path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python313', 'Scripts', 'yt-dlp.exe'),
+    path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming', 'Python', 'Python311', 'Scripts', 'yt-dlp.exe'),
+    'C:\\ProgramData\\chocolatey\\bin\\yt-dlp.exe',
+    '/data/data/com.termux/files/usr/bin/yt-dlp',
+    path.join(process.env.HOME || '', '.local', 'bin', 'yt-dlp')
+];
+
+function findYtDlp() {
+    for (const p of YTDLP_PATHS) {
+        try {
+            const result = require('child_process').execSync(`"${p}" --version`, { timeout: 5000, stdio: 'pipe' });
+            const version = result.toString().trim();
+            logger.info('[TIKTOK] yt-dlp encontrado en:', p, '- Versión:', version);
+            return p;
+        } catch (e) { }
+    }
+    return null;
+}
 
 function extractUrl(message) {
     const body = message.body;
@@ -31,29 +58,56 @@ function isValidTikTokUrl(url) {
     return /https?:\/\/(?:www\.|vm\.|m\.|[a-z]+\.)?tiktok\.com/i.test(url);
 }
 
-async function getVideoFromApi(url) {
-    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
-    logger.info('[TIKTOK] Consultando API:', apiUrl);
+async function tryApiDownload(url) {
+    const apiUrl = `https://api.davidcyriltech.my.id/download/tiktok?url=${encodeURIComponent(url)}`;
+    logger.info('[TIKTOK] Intentando API:', apiUrl);
     
-    const response = await axios.get(apiUrl, {
-        timeout: 30000,
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-            'Referer': 'https://www.tiktok.com/',
-            'Origin': 'https://www.tiktok.com'
-        }
-    });
+    const response = await axios.get(apiUrl, { timeout: 15000 });
     
-    if (response.data.code !== 0) {
-        throw new Error(response.data.msg || 'La API no pudo procesar el video');
+    if (response.data && response.data.status === true && response.data.result) {
+        const data = response.data.result;
+        return {
+            videoUrl: data.video || data.hd_video || data.watermark,
+            title: data.title || 'Video de TikTok',
+            author: data.author?.nickname || 'Desconocido',
+            duration: 0,
+            method: 'API'
+        };
     }
     
-    return response.data.data;
+    throw new Error('La API no devolvió un resultado válido');
+}
+
+async function tryYtdlpDownload(url, tempDir, ytDlpPath) {
+    const idUnico = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const plantillaSalida = path.join(tempDir, `tiktok_${idUnico}_%(id)s.%(ext)s`);
+    const cmd = `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate "${url}"`;
+    
+    logger.info('[TIKTOK] Intentando yt-dlp:', cmd);
+    
+    const { stdout, stderr } = await execPromise(cmd, { timeout: 120000 });
+    if (stderr) logger.warn('[TIKTOK] yt-dlp stderr:', stderr.slice(0, 500));
+    
+    const archivos = fs.readdirSync(tempDir)
+        .filter(f => f.startsWith(`tiktok_${idUnico}_`))
+        .map(f => path.join(tempDir, f));
+    
+    if (archivos.length === 0) {
+        throw new Error('yt-dlp no generó ningún archivo');
+    }
+    
+    return {
+        filePath: archivos[0],
+        title: 'Video de TikTok',
+        author: 'Desconocido',
+        duration: 0,
+        method: 'yt-dlp'
+    };
 }
 
 async function processTikTokCommand(client, message) {
+    let filePath = null;
+
     try {
         const url = extractUrl(message);
         logger.info('[TIKTOK] URL extraída:', url);
@@ -72,54 +126,64 @@ async function processTikTokCommand(client, message) {
 
         await message.reply(status('⏳ Descargando video de TikTok...'));
 
-        logger.info('[TIKTOK] Obteniendo video desde API...');
-        const videoData = await getVideoFromApi(url);
-        
-        const videoUrl = videoData.play;
-        const title = videoData.title || 'Video de TikTok';
-        const author = videoData.author?.nickname || 'Desconocido';
-        const duration = videoData.duration || 0;
-
-        logger.info('[TIKTOK] Título:', title, '- Autor:', author, '- Duración:', duration, 'segundos');
-
-        if (!videoUrl) {
-            throw new Error('No se obtuvo la URL del video desde la API');
-        }
-
         const tempDir = path.join(__dirname, '..', '..', 'temp');
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
         }
 
-        logger.info('[TIKTOK] Descargando video...');
-        const videoResponse = await axios.get(videoUrl, { 
-            responseType: 'stream',
-            timeout: 60000 
-        });
+        let result = null;
 
-        const filePath = path.join(tempDir, `tiktok_${Date.now()}.mp4`);
-        const writer = fs.createWriteStream(filePath);
-        
-        await new Promise((resolve, reject) => {
-            videoResponse.data.pipe(writer);
-            writer.on('finish', resolve);
-            writer.on('error', reject);
-        });
+        // INTENTO 1: API (rápido, sin almacenamiento local)
+        try {
+            result = await tryApiDownload(url);
+            logger.info('[TIKTOK] API exitosa. Descargando video...');
+            
+            const videoResponse = await axios.get(result.videoUrl, { 
+                responseType: 'stream',
+                timeout: 60000 
+            });
 
-        logger.info('[TIKTOK] Video descargado:', filePath);
+            filePath = path.join(tempDir, `tiktok_${Date.now()}.mp4`);
+            const writer = fs.createWriteStream(filePath);
+            
+            await new Promise((resolve, reject) => {
+                videoResponse.data.pipe(writer);
+                writer.on('finish', resolve);
+                writer.on('error', reject);
+            });
+            
+            logger.info('[TIKTOK] Video descargado vía API:', filePath);
+        } catch (apiErr) {
+            logger.warn('[TIKTOK] API falló:', apiErr.message);
+            logger.info('[TIKTOK] Activando respaldo con yt-dlp...');
+            result = null;
+        }
+
+        // INTENTO 2: yt-dlp (respaldo probado)
+        if (!result || !filePath) {
+            const ytDlpPath = findYtDlp();
+            if (!ytDlpPath) {
+                throw new Error('No se encontró yt-dlp y la API falló');
+            }
+            
+            const ytdlpResult = await tryYtdlpDownload(url, tempDir, ytDlpPath);
+            filePath = ytdlpResult.filePath;
+            result = ytdlpResult;
+            logger.info('[TIKTOK] Video descargado vía yt-dlp:', filePath);
+        }
 
         const datosVideo = {
-            title: title,
-            duration: duration,
+            title: result.title || 'Video de TikTok',
+            duration: result.duration || 0,
             hashtags: [],
-            uploader: author,
+            uploader: result.author || 'Desconocido',
             filePath: filePath
         };
 
         await sendTikTokVideo(client, message, datosVideo);
-        logger.info('[TIKTOK] Video enviado OK');
+        logger.info('[TIKTOK] Video enviado OK (método:', result.method, ')');
 
-        if (fs.existsSync(filePath)) {
+        if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
 
@@ -132,11 +196,15 @@ async function processTikTokCommand(client, message) {
             msg = 'La solicitud tardó demasiado. Intenta de nuevo.';
         } else if (err.message && err.message.includes('ECONNREFUSED')) {
             msg = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
-        } else if (err.response && err.response.status === 404) {
-            msg = 'El video no fue encontrado. Puede haber sido eliminado.';
+        } else if (err.message && err.message.includes('No se encontró yt-dlp')) {
+            msg = 'No se pudo descargar el video. Instala yt-dlp o intenta más tarde.';
         }
 
         await sendImageWithCaption(client, message.from, 'tiktok', warn(msg));
+
+        if (filePath && fs.existsSync(filePath)) {
+            try { fs.unlinkSync(filePath); } catch (e) {}
+        }
     }
 }
 
