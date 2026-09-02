@@ -58,9 +58,29 @@ function isValidTikTokUrl(url) {
     return /https?:\/\/(?:www\.|vm\.|m\.|[a-z]+\.)?tiktok\.com/i.test(url);
 }
 
-async function tryApiDownload(url) {
+async function tryGiftedTechApi(url) {
+    const apiUrl = `https://api.giftedtech.web.id/api/download/tiktok?url=${encodeURIComponent(url)}&apikey=gifted`;
+    logger.info('[TIKTOK] Intentando API GiftedTech...');
+    
+    const response = await axios.get(apiUrl, { timeout: 15000 });
+    
+    const data = response.data.result || response.data;
+    if (data && (data.video || data.nowm)) {
+        return {
+            videoUrl: data.video || data.nowm || data.watermark,
+            title: data.title || 'Video de TikTok',
+            author: data.author?.nickname || 'Desconocido',
+            duration: 0,
+            method: 'API-GiftedTech'
+        };
+    }
+    
+    throw new Error('GiftedTech no devolvió un resultado válido');
+}
+
+async function tryDavidCyrilApi(url) {
     const apiUrl = `https://api.davidcyriltech.my.id/download/tiktok?url=${encodeURIComponent(url)}`;
-    logger.info('[TIKTOK] Intentando API:', apiUrl);
+    logger.info('[TIKTOK] Intentando API DavidCyrilTech...');
     
     const response = await axios.get(apiUrl, { timeout: 15000 });
     
@@ -71,11 +91,11 @@ async function tryApiDownload(url) {
             title: data.title || 'Video de TikTok',
             author: data.author?.nickname || 'Desconocido',
             duration: 0,
-            method: 'API'
+            method: 'API-DavidCyril'
         };
     }
     
-    throw new Error('La API no devolvió un resultado válido');
+    throw new Error('DavidCyrilTech no devolvió un resultado válido');
 }
 
 async function tryYtdlpDownload(url, tempDir, ytDlpPath) {
@@ -148,10 +168,10 @@ async function processTikTokCommand(client, message) {
 
         let result = null;
 
-        // INTENTO 1: API (rápido, sin almacenamiento local)
+        // INTENTO 1: API GiftedTech (rápida)
         try {
-            result = await tryApiDownload(url);
-            logger.info('[TIKTOK] API exitosa. Descargando video...');
+            result = await tryGiftedTechApi(url);
+            logger.info('[TIKTOK] GiftedTech exitosa. Descargando video...');
             
             const videoResponse = await axios.get(result.videoUrl, { 
                 responseType: 'stream',
@@ -167,15 +187,42 @@ async function processTikTokCommand(client, message) {
                 writer.on('error', reject);
             });
             
-            logger.info('[TIKTOK] Video descargado vía API:', filePath);
+            logger.info('[TIKTOK] Video descargado vía GiftedTech:', filePath);
         } catch (apiErr) {
-            logger.warn('[TIKTOK] API falló:', apiErr.message);
-            logger.info('[TIKTOK] Activando respaldo con yt-dlp...');
+            logger.warn('[TIKTOK] GiftedTech falló:', apiErr.message);
             result = null;
         }
 
-        // INTENTO 2: yt-dlp (respaldo probado)
+        // INTENTO 2: API DavidCyrilTech (respaldo)
         if (!result || !filePath) {
+            try {
+                result = await tryDavidCyrilApi(url);
+                logger.info('[TIKTOK] DavidCyrilTech exitosa. Descargando video...');
+                
+                const videoResponse = await axios.get(result.videoUrl, { 
+                    responseType: 'stream',
+                    timeout: 60000 
+                });
+
+                filePath = path.join(tempDir, `tiktok_${Date.now()}.mp4`);
+                const writer = fs.createWriteStream(filePath);
+                
+                await new Promise((resolve, reject) => {
+                    videoResponse.data.pipe(writer);
+                    writer.on('finish', resolve);
+                    writer.on('error', reject);
+                });
+                
+                logger.info('[TIKTOK] Video descargado vía DavidCyrilTech:', filePath);
+            } catch (apiErr) {
+                logger.warn('[TIKTOK] DavidCyrilTech falló:', apiErr.message);
+                result = null;
+            }
+        }
+
+        // INTENTO 3: yt-dlp (respaldo final - funciona en terminal)
+        if (!result || !filePath) {
+            logger.info('[TIKTOK] Activando respaldo final con yt-dlp...');
             const ytDlpPath = findYtDlp();
             if (!ytDlpPath) {
                 throw new Error('No se encontró yt-dlp y la API falló');
