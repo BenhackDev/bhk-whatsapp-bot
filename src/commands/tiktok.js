@@ -81,12 +81,27 @@ async function tryApiDownload(url) {
 async function tryYtdlpDownload(url, tempDir, ytDlpPath) {
     const idUnico = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const plantillaSalida = path.join(tempDir, `tiktok_${idUnico}_%(id)s.%(ext)s`);
-    const cmd = `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate "${url}"`;
+    
+    // En Termux, usar bash -c para cargar el entorno correcto
+    const isTermux = process.env.TERMUX_VERSION || ytDlpPath.includes('com.termux');
+    let cmd;
+    
+    if (isTermux) {
+        cmd = `bash -c "'${ytDlpPath}' -o '${plantillaSalida}' --no-playlist --no-warnings --no-check-certificate '${url}'"`;
+    } else {
+        cmd = `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate "${url}"`;
+    }
     
     logger.info('[TIKTOK] Intentando yt-dlp:', cmd);
     
-    const { stdout, stderr } = await execPromise(cmd, { timeout: 120000 });
-    if (stderr) logger.warn('[TIKTOK] yt-dlp stderr:', stderr.slice(0, 500));
+    try {
+        const { stdout, stderr } = await execPromise(cmd, { timeout: 120000 });
+        if (stderr) logger.warn('[TIKTOK] yt-dlp stderr:', stderr.slice(0, 500));
+    } catch (e) {
+        logger.error('[TIKTOK] yt-dlp STDOUT:', (e.stdout || '').slice(0, 500));
+        logger.error('[TIKTOK] yt-dlp STDERR:', (e.stderr || '').slice(0, 500));
+        throw e;
+    }
     
     const archivos = fs.readdirSync(tempDir)
         .filter(f => f.startsWith(`tiktok_${idUnico}_`))
