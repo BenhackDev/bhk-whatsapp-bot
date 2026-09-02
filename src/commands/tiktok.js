@@ -32,16 +32,25 @@ function isValidTikTokUrl(url) {
 }
 
 async function getVideoFromApi(url) {
-    const apiUrl = `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`;
+    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
     logger.info('[TIKTOK] Consultando API:', apiUrl);
     
-    const response = await axios.get(apiUrl, { timeout: 30000 });
+    const response = await axios.get(apiUrl, {
+        timeout: 30000,
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+            'Referer': 'https://www.tiktok.com/',
+            'Origin': 'https://www.tiktok.com'
+        }
+    });
     
-    if (response.data.status !== 200 || !response.data.result) {
-        throw new Error(response.data.message || 'La API no pudo procesar el video');
+    if (response.data.code !== 0) {
+        throw new Error(response.data.msg || 'La API no pudo procesar el video');
     }
     
-    return response.data.result;
+    return response.data.data;
 }
 
 async function processTikTokCommand(client, message) {
@@ -66,11 +75,12 @@ async function processTikTokCommand(client, message) {
         logger.info('[TIKTOK] Obteniendo video desde API...');
         const videoData = await getVideoFromApi(url);
         
-        const videoUrl = videoData.video?.no_watermark || videoData.video?.watermark;
+        const videoUrl = videoData.play;
         const title = videoData.title || 'Video de TikTok';
         const author = videoData.author?.nickname || 'Desconocido';
+        const duration = videoData.duration || 0;
 
-        logger.info('[TIKTOK] Título:', title, '- Autor:', author);
+        logger.info('[TIKTOK] Título:', title, '- Autor:', author, '- Duración:', duration, 'segundos');
 
         if (!videoUrl) {
             throw new Error('No se obtuvo la URL del video desde la API');
@@ -100,7 +110,7 @@ async function processTikTokCommand(client, message) {
 
         const datosVideo = {
             title: title,
-            duration: 0,
+            duration: duration,
             hashtags: [],
             uploader: author,
             filePath: filePath
