@@ -67,6 +67,7 @@ Es un proyecto **Open Source**, creado para la comunidad, y el protagonista de u
 | `🎬 .tiktok <url>` / `.tk <url>` | **Descarga videos de TikTok** (título, autor y hashtags incluidos) |
 | `🎬 .yt <url>` | **Descarga videos de YouTube** en 360p (máx. 10 min / 50 MB) |
 | `🗣️ .voz <texto>` | Convierte texto a **voz** (nota de audio) con ElevenLabs o TTS de Google |
+| `✨ .s <adjunto>` / `.st <nombre> <autor>` | Convierte una imagen, GIF o video en **sticker** |
 | `👥 .tagall` | Menciona a **todos los miembros** de un grupo (solo admins) |
 | `📋 .menu` / `.ayuda` | Muestra el menú interactivo del bot |
 | `👑 .creador` / `.owner` / `.redes` | Conoce al **creador** y sus redes sociales |
@@ -131,7 +132,7 @@ Flujo del mensaje: `mensaje → parseCommand() → routeCommand() → comando �
 |---|---|---|
 | [Node.js](https://nodejs.org) | ≥ 18 | Probado en Node 20 y 22 |
 | npm | ≥ 9 | Incluido con Node.js |
-| [ffmpeg](https://ffmpeg.org/download.html) | Actual | Necesario solo para el comando `.voz` |
+| [ffmpeg](https://ffmpeg.org/download.html) | Actual | Necesario para `.voz` y `.s` (stickers) |
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) | Actual | Necesario solo para `.tiktok` |
 | MySQL (opcional) | 5.7+ | Solo si quieres registro de usuarios/uso |
 
@@ -377,6 +378,7 @@ Cuando el bot conecta:
 | `.editar` / `.img-ia` | Editar imagen adjunta | `.editar haz esto más colorido` + foto |
 | `.tiktok` / `.tk` | Descargar video de TikTok | `.tk https://vm.tiktok.com/ABCDEF/` |
 | `.voz` | Texto a voz (nota de audio) | `.voz Hola comunidad, esto es BHK` |
+| `.s` / `.st` / `.sticker` | Imagen, GIF o video a sticker | `.st Gatos Ben` (respondiendo a un archivo) |
 | `.tagall` | Mencionar a todos en el grupo (solo admins) | `.tagall` |
 | `.menu` / `.ayuda` | Ver menú del bot | `.menu` |
 | `.creador` / `.owner` / `.redes` | Ver al creador y sus redes | `.creador` |

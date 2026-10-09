@@ -6,6 +6,7 @@ const { executeTagAll } = require('./tagAll');
 const { processTikTokCommand } = require('./tiktok');
 const { processYouTubeCommand } = require('./youtube');
 const { showCreatorInfo } = require('./creator');
+const { processStickerCommand } = require('./sticker');
 const { showStatus } = require('./status');
 const { error } = require('../config/branding');
 
@@ -52,6 +53,12 @@ async function routeCommand(parsed, message, client) {
 
         case 'yt':
             await processYouTubeCommand(client, message);
+            break;
+
+        case 's':
+        case 'st':
+        case 'sticker':
+            await processStickerCommand(client, message);
             break;
 
         case 'status':

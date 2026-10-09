@@ -13,6 +13,7 @@ Todos los comandos responden con **cualquier prefijo** configurado en `PREFIX_LI
 | `.tiktok <url>` / `.tk <url>` | Descarga videos de TikTok | yt-dlp |
 | `.voz <texto>` | Texto a voz (nota de audio) | ffmpeg |
 | `.tagall` | Menciona a todos en grupos | Solo administradores |
+| `.s` / `.st <nombre> <autor>` / `.sticker` | Convierte imagen, GIF o video en sticker | ffmpeg |
 
 ## Ejemplos
 
@@ -23,6 +24,8 @@ Todos los comandos responden con **cualquier prefijo** configurado en `PREFIX_LI
 .tk https://vm.tiktok.com/ABCDEF/
 .voz Hola comunidad, esto es BHK WhatsApp Bot
 .tagall
+.s                                (con imagen, GIF o video adjunto)
+.st Gatos Ben                     (responde a un mensaje multimedia)
 .menu
 ```
 
@@ -48,6 +51,12 @@ Todos los comandos responden con **cualquier prefijo** configurado en `PREFIX_LI
 ### `.tagall`
 - Solo funciona en **grupos** y solo para **administradores** del grupo
 - Excluye al propio bot de las menciones
+
+### `.s` / `.st` / `.sticker`
+- Convierte **imágenes, GIFs y videos** (máx. 10 s y 16 MB) en stickers WebP de 512×512
+- Acepta el archivo **adjunto al comando** o el **mensaje citado** (responder con `.s`)
+- Uso personalizado: `.st <nombre> <autor>` (ej. `.st Gatos Ben`) para el nombre del paquete
+- Los videos se recortan a los primeros 5 segundos; usa el ffmpeg del sistema
 
 ## Mensajes de error estándar
 
