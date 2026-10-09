@@ -25,6 +25,7 @@ async function showMenu(client, message, userId) {
             { icon: '🎵', label: '.tk', desc: 'Descarga videos de TikTok.' },
             { icon: '🎬', label: '.yt', desc: 'Descarga videos de YouTube (máx. 10 min).' },
             { icon: '🗣️', label: '.voz', desc: 'Convierte texto a voz.' },
+            { icon: '✨', label: '.s', desc: 'Convierte una imagen, GIF o video en sticker (alias: .sticker).' },
             { icon: '👥', label: '.tagall', desc: 'Menciona a todos en el grupo (solo admins).' },
             { icon: '👑', label: '.creador', desc: 'Conoce al creador y sus redes.' },
             { icon: '🧠', label: '.ayuda', desc: 'Aprende a usar el bot a fondo.' }
