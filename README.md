@@ -316,6 +316,7 @@ Toda la configuración vive en el archivo `.env` (ver [.env.example](.env.exampl
 |---|---|---|---|
 | `GEMINI_API_KEY` | ✅ | Clave de Gemini (chat + imágenes). [Obtener](https://aistudio.google.com/apikey) | — |
 | `PREFIX_LIST` | ❌ | Prefijos de comandos separados por coma | `.,#,/,$,!,%` |
+| `SELF_CHAT` | ❌ | `true`: el bot responde también a comandos que escribes con tu propio número (pruebas en "Mensajes contigo") | `true` |
 | `SESSION_NAME` | ❌ | Nombre de la carpeta de sesión | `session-client-one` |
 | `DB_HOST` | ❌ | Host de MySQL | `localhost` |
 | `DB_PORT` | ❌ | Puerto de MySQL | `3306` |

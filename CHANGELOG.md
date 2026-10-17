@@ -7,7 +7,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/), y
 ## [No publicado]
 
 ### Añadido
-- Nada por ahora.
+- ⚙️ **Variable `SELF_CHAT`** (default `true`): el bot ahora responde comandos escritos con tu propio número, así puedes probarlo en el chat "Mensajes contigo" sin necesitar otro celular. Con `SELF_CHAT=false` vuelve al comportamiento clásico (ignora tu propio número).
 
 ## [1.1.0] - 2026-08-01
 

@@ -1,11 +1,12 @@
 const { parseCommand, getUserId } = require('../utils/commandParser');
 const { routeCommand } = require('../commands/index');
 const { logUsage } = require('../services/usageService');
+const { SELF_CHAT } = require('../config/constants');
 const logger = require('../utils/logger');
 
 async function handleMessage(message, client) {
     try {
-        if (message.fromMe) return;
+        if (message.fromMe && !SELF_CHAT) return;
 
         const parsed = parseCommand(message.body);
         if (!parsed) return;
