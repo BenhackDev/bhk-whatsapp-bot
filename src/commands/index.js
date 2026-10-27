@@ -9,8 +9,23 @@ const { showCreatorInfo } = require('./creator');
 const { processStickerCommand } = require('./sticker');
 const { showStatus } = require('./status');
 const { error } = require('../config/branding');
+const { tryAcquireHeavy } = require('../utils/rateLimiter');
 
-async function routeCommand(parsed, message, client) {
+/**
+ * Comandos que consumen recursos pesados (descargas, ffmpeg, IA).
+ * Son los únicos que pasan por la compuerta de rate limiting (BHK-04).
+ */
+const HEAVY_COMMANDS = new Set([
+    'ia',
+    'img',
+    'editar', 'editar-ia', 'edit', 'img-ia',
+    'voz',
+    'tiktok', 'tk',
+    'yt',
+    's', 'st', 'sticker'
+]);
+
+async function dispatchCommand(parsed, message, client) {
     switch (parsed.command) {
         case 'menu':
         case 'ayuda':
@@ -72,6 +87,33 @@ async function routeCommand(parsed, message, client) {
                 `Escribe *${parsed.prefix}menu* para ver los comandos disponibles.`
             ));
     }
+}
+
+async function routeCommand(parsed, message, client) {
+    // Compuerta BHK-04: solo comandos pesados; en grupo, el usuario es el
+    // remitente real (author), nunca el identificador del chat grupal.
+    if (HEAVY_COMMANDS.has(parsed.command)) {
+        const userId = message.author || message.from;
+        const gate = tryAcquireHeavy(userId);
+
+        if (!gate.ok) {
+            const aviso = gate.reason === 'cooldown'
+                ? `⏳ espera *${Math.ceil((gate.retryAfterMs || 0) / 1000)}s* para volver a usar este comando multimedia.`
+                : '⛔ el bot está procesando otros archivos multimedia en este momento. Inténtalo en unos segundos.';
+            await client.sendText(message.from, aviso);
+            return;
+        }
+
+        try {
+            await dispatchCommand(parsed, message, client);
+        } finally {
+            // El slot se libera aunque el comando falle, para no agotar el límite.
+            gate.release();
+        }
+        return;
+    }
+
+    await dispatchCommand(parsed, message, client);
 }
 
 module.exports = { routeCommand };

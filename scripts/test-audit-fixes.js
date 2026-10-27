@@ -1,7 +1,8 @@
 /**
  * Pruebas de aceptación de la corrección de hallazgos de auditoría.
  * Cubre: BHK-01 (sin shell en .tk), BHK-03 (destinos + límite de bytes),
- * BHK-07 (loggedOut sin reconexión infinita) y guardas de regresión de
+ * BHK-04 (compuerta de comandos pesados), BHK-07 (loggedOut sin reconexión
+ * infinita), BHK-09 (manejadores de proceso) y guardas de regresión de
  * BHK-02/BHK-05/BHK-06/BHK-08.
  *
  * No usa la red salvo en el caso final de .img con una clave de prueba
@@ -21,6 +22,9 @@ const { DisconnectReason } = require('@whiskeysockets/baileys');
 const { validateTikTokUrl, isAllowedDownloadUrl, saveStreamWithLimit } = require('../src/commands/tiktok');
 const { wireEvents } = require('../src/infrastructure/whatsapp/events');
 const { BaileysAdapter } = require('../src/infrastructure/whatsapp/adapter');
+const { tryAcquireHeavy, resetLimiter, MAX_CONCURRENT } = require('../src/utils/rateLimiter');
+const { installProcessGuards } = require('../src/utils/processGuards');
+const logger = require('../src/utils/logger');
 
 const ROOT = path.join(__dirname, '..', 'src', 'commands');
 
@@ -142,6 +146,25 @@ function check(label, condition, detail = '') {
     check('ai.js usa la clave en el header', srcAI.includes("'x-goog-api-key': GEMINI_API_KEY"));
     check('adapter.js llama clearSession en onLoggedOut', srcAdapter.includes('clearSession();'));
 
+    // ========== Guardas de regresión BHK-04 / BHK-09 ==========
+    console.log('\n== Regresiones: compuerta y guards en el código ==');
+    const srcRateLimiter = fs.readFileSync(path.join(__dirname, '..', 'src/utils/rateLimiter.js'), 'utf8');
+    const srcProcessGuards = fs.readFileSync(path.join(__dirname, '..', 'src/utils/processGuards.js'), 'utf8');
+    const srcBot = fs.readFileSync(path.join(__dirname, '..', 'bhk-bot.js'), 'utf8');
+    const srcIndexRouter = readSrc('index.js');
+
+    check('rateLimiter.js soporta HEAVY_COOLDOWN_MS y HEAVY_MAX_CONCURRENT',
+        srcRateLimiter.includes('HEAVY_COOLDOWN_MS') && srcRateLimiter.includes('HEAVY_MAX_CONCURRENT'));
+    check('rateLimiter.js limita la memoria interna de usuarios', srcRateLimiter.includes('MAX_TRACKED_USERS'));
+    check('router solo somete comandos pesados a la compuerta', srcIndexRouter.includes('HEAVY_COMMANDS.has(parsed.command)'));
+    // El exit(1) legítimo del bloque uncaughtException no invalida el guard:
+    // el comportamiento real (rechazos sin tumbar el proceso) se prueba en runtime más arriba.
+    check('processGuards.js atiende unhandledRejection registrándolo',
+        srcProcessGuards.includes("process.on('unhandledRejection'") && srcProcessGuards.includes('logger.error'),
+        'falta el handler o el registro del error');
+    check('processGuards.js atiende uncaughtException (exit ordenado)', srcProcessGuards.includes("process.on('uncaughtException'") && srcProcessGuards.includes('process.exit(1)'));
+    check('bhk-bot.js instala los guards al arrancar', srcBot.includes('installProcessGuards'));
+
     // ================= BHK-02: el error se comunica al usuario =================
     console.log('\n== BHK-02: .img con clave inválida responde con un error visible ==');
     const { generateImage } = require('../src/commands/image');
@@ -156,6 +179,63 @@ function check(label, condition, detail = '') {
     const lastSent = sent[sent.length - 1] || '';
     check('el usuario recibe al menos una respuesta', sent.length >= 1);
     check('la respuesta final comunica el error (no silencio)', /Error|error/i.test(lastSent), lastSent.slice(0, 60));
+
+    // ================= BHK-04 =================
+    console.log('\n== BHK-04: compuerta de comandos pesados ==');
+    resetLimiter();
+    const g1 = tryAcquireHeavy('user-a');
+    check('primer comando pesado se admite', g1.ok === true && typeof g1.release === 'function');
+    const g2 = tryAcquireHeavy('user-a');
+    check('mismo usuario en cooldown es rechazado', g2.ok === false && g2.reason === 'cooldown');
+    check('el cooldown informa tiempo de espera', typeof g2.retryAfterMs === 'number' && g2.retryAfterMs > 0);
+    const g3 = tryAcquireHeavy('user-b');
+    check('el cooldown es por usuario: otro usuario pasa', g3.ok === true);
+    check('el límite global default es 2 procesos', MAX_CONCURRENT === 2);
+    const g4 = tryAcquireHeavy('user-c');
+    check('límite global lleno rechaza a nuevos usuarios', g4.ok === false && g4.reason === 'busy');
+    g1.release();
+    g3.release();
+    g3.release(); // doble release debe ser inofensivo
+    const g5 = tryAcquireHeavy('user-c');
+    check('tras liberar, un usuario vuelve a ser admitido', g5.ok === true);
+    g5.release();
+    resetLimiter();
+
+    // Comportamiento end-to-end del router con la compuerta.
+    console.log('\n== BHK-04: router somete comandos pesados a la compuerta ==');
+    const gateSends = [];
+    const gateClient = { async sendText(chatId, text) { gateSends.push(text); }, async sendMedia() {} };
+    const gateMsg = { body: '', from: 'gate-user@c.us' };
+    const { routeCommand } = require('../src/commands/index');
+
+    await routeCommand({ command: 'yt', prefix: '.' }, gateMsg, gateClient);
+    const firstCount = gateSends.length;
+    check('la primera invocación llega al comando (respuesta normal)', firstCount >= 1, 'sin respuestas');
+    await routeCommand({ command: 'yt', prefix: '.' }, gateMsg, gateClient);
+    const lastGate = gateSends[gateSends.length - 1] || '';
+    check('el segundo intento inmediato recibe el aviso de cooldown',
+        gateSends.length === firstCount + 1 && /espera/i.test(lastGate), lastGate.slice(0, 60));
+
+    // BHK-09
+    console.log('\n== BHK-09: manejadores globales de proceso ==');
+    installProcessGuards(logger);
+    check('unhandledRejection tiene manejador instalado', process.listenerCount('unhandledRejection') > 0);
+    check('uncaughtException tiene manejador instalado', process.listenerCount('uncaughtException') > 0);
+    installProcessGuards(logger);
+    check('la instalación es idempotente (sin duplicar manejadores)',
+        process.listenerCount('unhandledRejection') === 1 && process.listenerCount('uncaughtException') === 1);
+
+    // Una promesa rechazada sin manejar debe registrarse, no tumbar el proceso.
+    let guardLogged = false;
+    const origConsoleError = console.error;
+    console.error = (...args) => {
+        if (String(args.join(' ')).includes('Promesa rechazada')) guardLogged = true;
+        origConsoleError(...args);
+    };
+    Promise.reject(new Error('rej_seed_prueba'));
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    console.error = origConsoleError;
+    check('unhandledRejection se registra y el proceso sobrevive', guardLogged);
 
     console.log('\n' + (failed === 0 ? 'Todos los tests de aceptación pasaron ✔' : `${failed} test(s) fallaron ✖`));
     process.exit(failed === 0 ? 0 : 1);
