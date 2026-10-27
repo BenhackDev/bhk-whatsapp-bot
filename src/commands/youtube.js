@@ -1,8 +1,7 @@
 /**
  * Comando .yt — Descarga videos de YouTube usando yt-dlp.
  */
-
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const util = require('util');
 const fs = require('fs');
 const path = require('path');
@@ -12,8 +11,7 @@ const { sendImageWithCaption } = require('../utils/mediaHelper');
 const logger = require('../utils/logger');
 const { build, creditLine, error, warn, status } = require('../config/branding');
 
-const execPromise = util.promisify(exec);
-
+const execFileAsync = util.promisify(execFile);
 const MAX_DURACION_SEGUNDOS = 600;
 const MAX_TAMANO_BYTES = 50 * 1024 * 1024;
 
@@ -31,7 +29,7 @@ const YTDLP_PATHS = [
 function findYtDlp() {
     for (const p of YTDLP_PATHS) {
         try {
-            const result = require('child_process').execSync(`"${p}" --version`, { timeout: 5000, stdio: 'pipe' });
+            const result = require('child_process').execFileSync(p, ['--version'], { timeout: 5000, stdio: 'pipe' });
             const version = result.toString().trim();
             logger.info('[YT] yt-dlp encontrado en:', p, '- Versión:', version);
             return p;
@@ -53,9 +51,10 @@ function isValidYouTubeUrl(url) {
 }
 
 async function getMetadata(ytDlpPath, url) {
-    const cmd = `"${ytDlpPath}" --dump-json --no-playlist --no-warnings "${url}"`;
+    // Sin shell: argumentos separados y execFile.
+    const args = ['--dump-json', '--no-playlist', '--no-warnings', url];
     try {
-        const { stdout } = await execPromise(cmd, { timeout: 30000 });
+        const { stdout } = await execFileAsync(ytDlpPath, args, { timeout: 30000, maxBuffer: 8 * 1024 * 1024 });
         return JSON.parse(stdout);
     } catch (e) {
         const stderr = e.stderr || '';
@@ -66,17 +65,23 @@ async function getMetadata(ytDlpPath, url) {
     }
 }
 
-async function downloadVideo(ytDlpPath, url, tempDir) {
-    const idUnico = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+async function downloadVideo(ytDlpPath, url, tempDir, idUnico) {
     const plantillaSalida = path.join(tempDir, `yt_${idUnico}_%(id)s.%(ext)s`);
 
     try {
-        await execPromise(
-            `"${ytDlpPath}" -o "${plantillaSalida}" --no-playlist --no-warnings --no-check-certificate ` +
-            `--extractor-args "youtube:player_client=web,mweb" ` +
-            `-f "best[height<=360][ext=mp4]/best[height<=360]/best[ext=mp4]/best" ` +
-            `--merge-output-format mp4 "${url}"`,
-            { timeout: 120000 }
+        await execFileAsync(
+            ytDlpPath,
+            [
+                '-o', plantillaSalida,
+                '--no-playlist',
+                '--no-warnings',
+                '--no-check-certificate',
+                '--extractor-args', 'youtube:player_client=web,mweb',
+                '-f', 'best[height<=360][ext=mp4]/best[height<=360]/best[ext=mp4]/best',
+                '--merge-output-format', 'mp4',
+                url
+            ],
+            { timeout: 120000, maxBuffer: 8 * 1024 * 1024 }
         );
     } catch (e) {
         const stderr = e.stderr || '';
@@ -96,7 +101,13 @@ async function downloadVideo(ytDlpPath, url, tempDir) {
 }
 
 async function processYouTubeCommand(client, message) {
+    const tempDir = path.join(__dirname, '..', '..', 'temp');
+    if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+    }
+
     let filePath = null;
+    let ytdlpPrefix = null;
 
     try {
         logger.info('[YT] Buscando yt-dlp...');
@@ -158,13 +169,10 @@ async function processYouTubeCommand(client, message) {
 
         await message.reply(status('📥 Descargando video en formato ligero (360p)...'));
 
-        const tempDir = path.join(__dirname, '..', '..', 'temp');
-        if (!fs.existsSync(tempDir)) {
-            fs.mkdirSync(tempDir, { recursive: true });
-        }
-
         logger.info('[YT] Iniciando descarga...');
-        filePath = await downloadVideo(ytDlpPath, url, tempDir);
+        const idUnico = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        ytdlpPrefix = `yt_${idUnico}`;
+        filePath = await downloadVideo(ytDlpPath, url, tempDir, idUnico);
         logger.info('[YT] Descarga completa:', filePath);
 
         const media = BotMedia.fromFilePath(filePath);
@@ -180,9 +188,6 @@ async function processYouTubeCommand(client, message) {
         await client.sendMedia(message.from, media, { caption });
         logger.info('[YT] Video enviado OK');
 
-        if (filePath && fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
     } catch (err) {
         logger.error('[YT] Error:', err.message);
         logger.error('[YT] Stack:', err.stack);
@@ -196,8 +201,20 @@ async function processYouTubeCommand(client, message) {
 
         await sendImageWithCaption(client, message.from, 'yt', warn(msg));
 
+    } finally {
+        // BHK-06: limpieza tolerante a fallos, siempre, y solo de archivos
+        // creados por ESTA operación (filePath propio o prefijo único de yt-dlp).
         if (filePath && fs.existsSync(filePath)) {
             try { fs.unlinkSync(filePath); } catch (e) { }
+        }
+        if (ytdlpPrefix) {
+            try {
+                for (const f of fs.readdirSync(tempDir)) {
+                    if (f.startsWith(ytdlpPrefix)) {
+                        try { fs.unlinkSync(path.join(tempDir, f)); } catch (e) { }
+                    }
+                }
+            } catch (e) { }
         }
     }
 }

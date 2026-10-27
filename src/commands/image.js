@@ -108,6 +108,8 @@ function saveTempImage(imageData, mimeType) {
 }
 
 async function generateImage(client, message) {
+    const filesToClean = [];
+
     try {
         const { prompt } = extractPrompt(message);
 
@@ -122,6 +124,7 @@ async function generateImage(client, message) {
 
         const { imageData, mimeType, textoRespuesta } = await generateImageWithGemini(prompt);
         const rutaArchivo = saveTempImage(imageData, mimeType);
+        filesToClean.push(rutaArchivo);
 
         const caption = build(
             [
@@ -134,17 +137,18 @@ async function generateImage(client, message) {
         const media = BotMedia.fromFilePath(rutaArchivo);
         await client.sendMedia(message.from, media, { caption });
 
-        fs.unlinkSync(rutaArchivo);
+    } catch (err) {
+        // BHK-02: el parámetro se renombra a `err` para no sombrear la
+        // función `error` de branding; si no, el catch mismo se estrellaba.
+        logger.error('[IMAGEN]', err.message);
+        logger.debug('[IMAGEN] Stack:', err.stack);
 
-    } catch (error) {
-        logger.debug('[IMAGEN]', error);
-
-        if (error.message && error.message.includes('@google/genai')) {
+        if (err.message && err.message.includes('@google/genai')) {
             await sendImageWithCaption(client, message.from, 'img', error('Falta instalar @google/genai. Ejecuta: npm install @google/genai'));
             return;
         }
 
-        if (error.message && error.message.includes('API key not valid')) {
+        if (err.message && err.message.includes('API key not valid')) {
             await sendImageWithCaption(client, message.from, 'img', error('La clave de API de Gemini no es válida. Verifica tu API key.'));
             return;
         }
@@ -152,10 +156,17 @@ async function generateImage(client, message) {
         await sendImageWithCaption(client, message.from, 'img',
             warn('Ocurrió un error al generar la imagen.')
         );
+    } finally {
+        // BHK-06: la limpieza ocurre también si el envío falla.
+        for (const file of filesToClean) {
+            try { fs.unlinkSync(file); } catch (e) { /* ya no existe */ }
+        }
     }
 }
 
 async function generateImageAI(client, message) {
+    const filesToClean = [];
+
     try {
         const { prompt } = extractPrompt(message);
 
@@ -181,6 +192,7 @@ async function generateImageAI(client, message) {
 
         const { imageData, mimeType, textoRespuesta } = await generateImageWithGemini(prompt, attachedImage);
         const rutaArchivo = saveTempImage(imageData, mimeType);
+        filesToClean.push(rutaArchivo);
 
         const caption = build(
             [
@@ -194,19 +206,29 @@ async function generateImageAI(client, message) {
         const media = BotMedia.fromFilePath(rutaArchivo);
         await client.sendMedia(message.from, media, { caption });
 
-        fs.unlinkSync(rutaArchivo);
+    } catch (err) {
+        // BHK-02: sin sombreado de la función `error` de branding.
+        logger.error('[IMAGEN-IA]', err.message);
+        logger.debug('[IMAGEN-IA] Stack:', err.stack);
 
-    } catch (error) {
-        logger.debug('[IMAGEN-IA]', error);
-
-        if (error.message && error.message.includes('@google/genai')) {
+        if (err.message && err.message.includes('@google/genai')) {
             await sendImageWithCaption(client, message.from, 'img-ia', error('Falta instalar @google/genai. Ejecuta: npm install @google/genai'));
+            return;
+        }
+
+        if (err.message && err.message.includes('API key not valid')) {
+            await sendImageWithCaption(client, message.from, 'img-ia', error('La clave de API de Gemini no es válida. Verifica tu API key.'));
             return;
         }
 
         await sendImageWithCaption(client, message.from, 'img-ia',
             warn('Ocurrió un error al procesar la imagen.')
         );
+    } finally {
+        // BHK-06: la limpieza ocurre también si el envío falla.
+        for (const file of filesToClean) {
+            try { fs.unlinkSync(file); } catch (e) { /* ya no existe */ }
+        }
     }
 }
 

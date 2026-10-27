@@ -89,11 +89,12 @@ function wireEvents(sock, callbacks, adapter) {
 
             if (statusCode === DisconnectReason.loggedOut) {
                 callbacks.onAuthFailure?.('Sesión cerrada desde WhatsApp.');
+                // BHK-07: sesión invalidada — limpiar credenciales y NO reconectar.
+                adapter.onLoggedOut?.();
             } else {
                 callbacks.onDisconnect?.(statusCode);
+                adapter.scheduleReconnect();
             }
-
-            adapter.scheduleReconnect();
         }
     });
 

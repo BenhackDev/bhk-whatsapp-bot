@@ -8,6 +8,7 @@ function handleAuthenticated() {
 
 function handleAuthFailure(msg) {
     logger.warn('❌ Error de autenticación:', msg);
+    logger.warn('ℹ️ Escanea un nuevo código QR (reinicia el bot si no aparece).');
 }
 
 module.exports = { handleAuthenticated, handleAuthFailure };

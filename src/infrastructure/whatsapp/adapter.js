@@ -86,6 +86,23 @@ class BaileysAdapter {
         this.reconnectAttempts = 0;
     }
 
+    /**
+     * BHK-07: la sesión fue invalidada desde WhatsApp (loggedOut). Se limpian
+     * las credenciales locales y se detiene el ciclo de reconexión: sin esto,
+     * el bot reintentaba cada 30 s para siempre sin pedir un QR nuevo.
+     */
+    onLoggedOut() {
+        this.stopped = true;
+        clearTimeout(this.reconnectTimer);
+        try {
+            clearSession();
+            logger.warn('[BOT] 🗑️ Credenciales de sesión inválidas eliminadas.');
+        } catch (e) {
+            logger.warn('[BOT] No se pudo limpiar la sesión:', e.message);
+        }
+        logger.warn('[BOT] Reinicia el bot (node bhk-bot.js) y escanea un nuevo código QR.');
+    }
+
     scheduleReconnect() {
         if (this.stopped) return;
         clearTimeout(this.reconnectTimer);

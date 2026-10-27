@@ -1,7 +1,9 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+const execFileAsync = promisify(execFile);
 const { BotMedia } = require('../infrastructure/whatsapp/client');
 const { sendImageWithCaption } = require('../utils/mediaHelper');
 const logger = require('../utils/logger');
@@ -18,10 +20,18 @@ if (ELEVENLABS_API_KEY) {
 }
 registry.setService('google_tts', 'ok');
 
-function convertToOpus(inputPath, outputPath) {
-    execSync(
-        `ffmpeg -y -loglevel error -i "${inputPath}" -c:a libopus -b:a 64k -vbr on -application voip "${outputPath}"`,
-        { shell: true, timeout: 30000 }
+async function convertToOpus(inputPath, outputPath) {
+    // BHK-05: execFile con argumentos separados y sin shell. No bloquea el
+    // event loop (el bot sigue procesando mensajes durante la conversión).
+    await execFileAsync(
+        'ffmpeg',
+        [
+            '-y', '-loglevel', 'error', '-i', inputPath,
+            '-c:a', 'libopus', '-b:a', '64k',
+            '-vbr', 'on', '-application', 'voip',
+            outputPath
+        ],
+        { timeout: 30000, maxBuffer: 4 * 1024 * 1024 }
     );
 }
 
@@ -74,6 +84,9 @@ async function generateAudio(texto) {
 }
 
 async function processVoiceCommand(client, message) {
+    let mp3Path = null;
+    let oggPath = null;
+
     try {
         const parsed = require('../utils/commandParser').parseCommand(message.body);
         const texto = parsed ? parsed.args : '';
@@ -89,21 +102,27 @@ async function processVoiceCommand(client, message) {
         const tempDir = path.join(__dirname, '..', '..', 'temp');
         if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-        const mp3Path = path.join(tempDir, `voz_${Date.now()}.mp3`);
-        const oggPath = mp3Path.replace('.mp3', '.ogg');
+        mp3Path = path.join(tempDir, `voz_${Date.now()}.mp3`);
+        oggPath = mp3Path.replace('.mp3', '.ogg');
         fs.writeFileSync(mp3Path, audioBuffer);
 
-        convertToOpus(mp3Path, oggPath);
+        await convertToOpus(mp3Path, oggPath);
 
         const oggBuffer = fs.readFileSync(oggPath);
         const media = BotMedia.fromBuffer(oggBuffer, 'audio/ogg; codecs=opus', `voz_${Date.now()}.ogg`);
         await client.sendMedia(message.from, media, { asVoice: true });
-
-        fs.unlinkSync(mp3Path);
-        fs.unlinkSync(oggPath);
-    } catch (error) {
-        logger.debug('[VOZ]', error);
+    } catch (err) {
+        // Sin sombreado de la función `error` de branding (patrón BHK-02).
+        logger.error('[VOZ]', err.message);
+        logger.debug('[VOZ] Stack:', err.stack);
         await sendImageWithCaption(client, message.from, 'voz', error('Error al generar el audio. Intenta de nuevo.'));
+    } finally {
+        // BHK-06: los temporales se limpian también si el envío o ffmpeg fallan.
+        for (const file of [mp3Path, oggPath]) {
+            if (file && fs.existsSync(file)) {
+                try { fs.unlinkSync(file); } catch (e) { /* ya no existe */ }
+            }
+        }
     }
 }
 

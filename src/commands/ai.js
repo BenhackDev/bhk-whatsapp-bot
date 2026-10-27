@@ -27,8 +27,10 @@ async function handleAICommand(message, client) {
 
         const respuesta = await getGeminiResponse(prompt);
         await sendImageWithCaption(client, message.from, 'ia', respuesta);
-    } catch (error) {
-        logger.debug('[AI] No se pudo obtener respuesta:', error);
+    } catch (err) {
+        // BHK-08: no se volcam objetos de error completos (la config de axios
+        // incluiría la URL con la clave). Solo el mensaje.
+        logger.debug('[AI] No se pudo obtener respuesta:', err.message);
         await sendImageWithCaption(client, message.from, 'ia',
             error('Hubo un problema al procesar tu solicitud. Intenta más tarde.'));
     }
@@ -41,7 +43,7 @@ async function getGeminiResponse(texto) {
     for (let intento = 1; intento <= MAX_RETRIES; intento++) {
         try {
             const respuesta = await axios.post(
-                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
                 {
                     systemInstruction: {
                         parts: [{ text: SYSTEM_PROMPT }]
@@ -57,8 +59,11 @@ async function getGeminiResponse(texto) {
                     }
                 },
                 {
+                    // BHK-08: la clave viaja en el header, nunca en la URL
+                    // (que acaba en logs si el error se imprime completo).
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': GEMINI_API_KEY
                     },
                     timeout: 30000
                 }
@@ -72,9 +77,9 @@ async function getGeminiResponse(texto) {
             }
 
             return contenido;
-        } catch (error) {
-            if (error.response && error.response.status === 429) {
-                const msg = error.response.data?.error?.message || '';
+        } catch (err) {
+            if (err.response && err.response.status === 429) {
+                const msg = err.response.data?.error?.message || '';
                 const match = msg.match(/retry in (\d+(?:\.\d+)?)s/);
                 const espera = match ? Math.min(parseInt(match[1]) + 1, 30) : 20;
 
@@ -85,7 +90,7 @@ async function getGeminiResponse(texto) {
                 }
                 return warn('Límite de la cuota gratuita de Gemini excedido. Espera un momento o genera una nueva API key en https://aistudio.google.com/apikey');
             }
-            throw error;
+            throw err;
         }
     }
 }
