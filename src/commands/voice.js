@@ -83,6 +83,10 @@ async function generateAudio(texto) {
     return await generateGoogleTTS(texto);
 }
 
+// BHK-12: Google TTS gratuito rechaza textos largos y ElevenLabs cobra por
+// caracteres; se limita el texto para no catalogar errores ni gastar cuota.
+const MAX_VOZ_TEXT_LENGTH = 500;
+
 async function processVoiceCommand(client, message) {
     let mp3Path = null;
     let oggPath = null;
@@ -93,6 +97,13 @@ async function processVoiceCommand(client, message) {
 
         if (!texto) {
             await sendImageWithCaption(client, message.from, 'voz', error('Escribe el texto después del comando.\nEjemplo: .voz Hola mundo'));
+            return;
+        }
+
+        // BHK-12: rechazo temprano antes de consumir la TTS.
+        if (texto.length > MAX_VOZ_TEXT_LENGTH) {
+            await sendImageWithCaption(client, message.from, 'voz',
+                error(`Tu texto es demasiado largo (${texto.length} caracteres; el límite es ${MAX_VOZ_TEXT_LENGTH}).\nDivide el texto en partes más cortas.`));
             return;
         }
 

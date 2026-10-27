@@ -16,6 +16,9 @@ if (!API_KEY || API_KEY === 'PEGA-TU-CLAVE-AQUI-BRO') {
 }
 const MODEL = 'gemini-2.0-flash-preview-image-generation';
 
+// BHK-12: los prompts de imagen se limitan (payload y cuota de la API).
+const MAX_IMAGE_PROMPT_LENGTH = 500;
+
 let GoogleGenAI;
 
 async function loadSDK() {
@@ -120,6 +123,14 @@ async function generateImage(client, message) {
             return;
         }
 
+        // BHK-12: rechazo temprano antes de gastar cuota de la API.
+        if (prompt.length > MAX_IMAGE_PROMPT_LENGTH) {
+            await sendImageWithCaption(client, message.from, 'img',
+                error(`Tu descripción es demasiado larga (${prompt.length} caracteres; el límite es ${MAX_IMAGE_PROMPT_LENGTH}).\nAcórtala e inténtalo de nuevo.`)
+            );
+            return;
+        }
+
         await sendImageWithCaption(client, message.from, 'img', status('🎨 Generando imagen... esto puede tomar unos segundos.'));
 
         const { imageData, mimeType, textoRespuesta } = await generateImageWithGemini(prompt);
@@ -173,6 +184,14 @@ async function generateImageAI(client, message) {
         if (!prompt) {
             await sendImageWithCaption(client, message.from, 'img-ia',
                 error('Debes escribir una descripción.\nEjemplo: .editar haz esto más colorido (con una imagen adjunta)')
+            );
+            return;
+        }
+
+        // BHK-12: rechazo temprano antes de gastar cuota de la API.
+        if (prompt.length > MAX_IMAGE_PROMPT_LENGTH) {
+            await sendImageWithCaption(client, message.from, 'img-ia',
+                error(`Tu descripción es demasiado larga (${prompt.length} caracteres; el límite es ${MAX_IMAGE_PROMPT_LENGTH}).\nAcórtala e inténtalo de nuevo.`)
             );
             return;
         }

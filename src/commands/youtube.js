@@ -100,6 +100,16 @@ async function downloadVideo(ytDlpPath, url, tempDir, idUnico) {
     return archivos[0];
 }
 
+/**
+ * BHK-11: único check fiable del tamaño; se comprueba el archivo ya
+ * descargado (metadata.filesize a veces viene vacío).
+ */
+function fileExceedsLimit(filePath, maxBytes) {
+    let size = 0;
+    try { size = fs.statSync(filePath).size; } catch (e) { return false; }
+    return size > maxBytes;
+}
+
 async function processYouTubeCommand(client, message) {
     const tempDir = path.join(__dirname, '..', '..', 'temp');
     if (!fs.existsSync(tempDir)) {
@@ -156,6 +166,8 @@ async function processYouTubeCommand(client, message) {
         }
 
         const tamanoBytes = Number(metadata.filesize) || Number(metadata.filesize_approx) || 0;
+        // Nota: filesize puede venir vacío; ese caso lo cubre BHK-11 con el
+        // check del tamaño real después de descargar.
         logger.info('[YT] Tamaño estimado:', (tamanoBytes / 1024 / 1024).toFixed(1), 'MB');
         if (tamanoBytes > MAX_TAMANO_BYTES) {
             await sendImageWithCaption(client, message.from, 'yt',
@@ -174,6 +186,21 @@ async function processYouTubeCommand(client, message) {
         ytdlpPrefix = `yt_${idUnico}`;
         filePath = await downloadVideo(ytDlpPath, url, tempDir, idUnico);
         logger.info('[YT] Descarga completa:', filePath);
+
+        // BHK-11: el pre-check usa metadata.filesize, que a veces viene vacío
+        // (0). El único check fiable es el tamaño del archivo ya descargado;
+        // si se pasa, se rechaza y el finally elimina el parcial.
+        if (fileExceedsLimit(filePath, MAX_TAMANO_BYTES)) {
+            const tamanoReal = fs.statSync(filePath).size;
+            logger.warn('[YT] Descarga supera el límite:', (tamanoReal / 1024 / 1024).toFixed(1), 'MB');
+            await sendImageWithCaption(client, message.from, 'yt',
+                error(
+                    `El video descargado pesa *${(tamanoReal / 1024 / 1024).toFixed(1)} MB* y supera el límite de *50 MB*.\n\n` +
+                    `Prueba con un video más corto o ligero.`
+                )
+            );
+            return;
+        }
 
         const media = BotMedia.fromFilePath(filePath);
         const caption = build(
@@ -219,4 +246,4 @@ async function processYouTubeCommand(client, message) {
     }
 }
 
-module.exports = { processYouTubeCommand };
+module.exports = { processYouTubeCommand, fileExceedsLimit };

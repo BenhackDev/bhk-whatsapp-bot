@@ -1,8 +1,8 @@
 /**
- * Pruebas de aceptación de la corrección de hallazgos de auditoría.
- * Cubre: BHK-01 (sin shell en .tk), BHK-03 (destinos + límite de bytes),
+ * Pruebas de aceptación de la corrección de hallazgos de auditoría.    * Cubre: BHK-01 (sin shell en .tk), BHK-03 (destinos + límite de bytes),
  * BHK-04 (compuerta de comandos pesados), BHK-07 (loggedOut sin reconexión
- * infinita), BHK-09 (manejadores de proceso) y guardas de regresión de
+ * infinita), BHK-09 (manejadores de proceso), BHK-11 (tamaño real del download
+ * en .yt), BHK-12 (límites de longitud) y guardas de regresión de
  * BHK-02/BHK-05/BHK-06/BHK-08.
  *
  * No usa la red salvo en el caso final de .img con una clave de prueba
@@ -236,6 +236,58 @@ function check(label, condition, detail = '') {
     await new Promise((resolve) => setTimeout(resolve, 250));
     console.error = origConsoleError;
     check('unhandledRejection se registra y el proceso sobrevive', guardLogged);
+
+    // ================= BHK-11 =================
+    console.log('\n== BHK-11: check de tamaño del archivo descargado (.yt) ==');
+    const { fileExceedsLimit } = require('../src/commands/youtube');
+    const bigFile = path.join(__dirname, '..', 'temp', 'audit_test_big.bin');
+    fs.writeFileSync(bigFile, Buffer.alloc(1024 * 1024, 1)); // 1 MB
+    check('archivo de 1 MB contra límite de 0.5 MB se rechaza', fileExceedsLimit(bigFile, 512 * 1024) === true);
+    check('archivo de 1 MB contra límite de 2 MB se acepta', fileExceedsLimit(bigFile, 2 * 1024 * 1024) === false);
+    check('archivo inexistente no asume exceso', fileExceedsLimit(bigFile + '.no-existe', 1) === false);
+    try { fs.rmSync(bigFile, { force: true }); } catch (e) {}
+
+    // ================= BHK-12 =================
+    console.log('\n== BHK-12: límites de longitud en .ia / .img / .voz ==');
+    function makeCaptureClient() {
+        const out = [];
+        return {
+            out,
+            async sendText(chatId, text) { out.push(text); },
+            async sendMedia(chatId, media, options) { out.push(options.caption || ''); }
+        };
+    }
+
+    // .ia con 1100 caracteres: debe rechazarse ANTES de tocar la API de
+    // Gemini (con la clave de prueba inválida, cualquier llamada fallaria).
+    const { handleAICommand } = require('../src/commands/ai');
+    const capAI = makeCaptureClient();
+    await handleAICommand({ body: '.ia ' + 'x'.repeat(1100), from: 'lim-ia@c.us' }, capAI);
+    check('.ia rechaza prompts de más de 1000 caracteres',
+        capAI.out.length === 1 && /demasiado largo/i.test(capAI.out[0]), capAI.out.join(' | ').slice(0, 80));
+    check('.ia no gasta cuota de Gemini con prompts largos', !capAI.out.join(' ').includes('Hubo un problema'));
+
+    // .img con 600 caracteres: rechazo antes del estado "Generando imagen".
+    const { generateImage: genImgLimit, generateImageAI: genImgAILimit } = require('../src/commands/image');
+    const capImg = makeCaptureClient();
+    await genImgLimit(capImg, { body: '.img ' + 'y'.repeat(600), from: 'lim-img@c.us', hasMedia: false });
+    check('.img rechaza prompts de más de 500 caracteres',
+        capImg.out.length === 1 && /demasiado larga/i.test(capImg.out[0]), capImg.out.join(' | ').slice(0, 80));
+    check('.img no llama a la API con prompts largos', !capImg.out.join(' ').includes('Generando'));
+
+    // .editar (generateImageAI) aplica el mismo límite.
+    const capEdit = makeCaptureClient();
+    await genImgAILimit(capEdit, { body: '.editar ' + 'z'.repeat(600), from: 'lim-edit@c.us', hasMedia: false });
+    check('.editar rechaza prompts de más de 500 caracteres',
+        capEdit.out.length === 1 && /demasiado larga/i.test(capEdit.out[0]), capEdit.out.join(' | ').slice(0, 80));
+
+    // .voz con 600 caracteres: rechazo antes de llamar a la TTS.
+    const { processVoiceCommand: vozLimit } = require('../src/commands/voice');
+    const capVoz = makeCaptureClient();
+    await vozLimit(capVoz, { body: '.voz ' + 'w'.repeat(600), from: 'lim-voz@c.us', reply: async (t) => capVoz.out.push(t) });
+    check('.voz rechaza textos de más de 500 caracteres',
+        capVoz.out.length === 1 && /demasiado largo/i.test(capVoz.out[0]), capVoz.out.join(' | ').slice(0, 80));
+    check('.voz no llama a la TTS con textos largos', !capVoz.out.join(' ').includes('Generando audio'));
 
     console.log('\n' + (failed === 0 ? 'Todos los tests de aceptación pasaron ✔' : `${failed} test(s) fallaron ✖`));
     process.exit(failed === 0 ? 0 : 1);

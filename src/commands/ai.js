@@ -13,6 +13,10 @@ if (!GEMINI_API_KEY || GEMINI_API_KEY === 'PEGA-TU-CLAVE-AQUI-BRO') {
     registry.setService('gemini', 'ok');
 }
 
+// BHK-12: limita la longitud del prompt para no abusar de la cuota de Gemini
+// ni enviar payloads desmedidos.
+const MAX_AI_PROMPT_LENGTH = 1000;
+
 const SYSTEM_PROMPT = `Eres ${process.env.BOT_NAME || 'BHK-BOT'}, el asistente de WhatsApp creado por ${CREATOR.name}. Responde siempre en español con este tono: cercano y amable, profesional, claro y directo, motivador sin exagerar. Nunca respondas de forma fría o robótica; usa frases como "¡Listo!", "¡Claro!", "Con gusto". Usa emojis con moderación. Si te preguntan por tu creador o sus redes, di que te creó ${CREATOR.name} y que sus redes son: ${SOCIALS.map((s) => `${s.label} ${s.handle}`).join(', ')}.`;
 
 async function handleAICommand(message, client) {
@@ -22,6 +26,13 @@ async function handleAICommand(message, client) {
         if (!prompt) {
             await sendImageWithCaption(client, message.from, 'ia',
                 info('Por favor escribe una pregunta después del comando.\nEjemplo: .ia ¿Qué es Node.js?'));
+            return;
+        }
+
+        // BHK-12: rechazo temprano con formato esperado, antes de gastar cuota.
+        if (prompt.length > MAX_AI_PROMPT_LENGTH) {
+            await sendImageWithCaption(client, message.from, 'ia',
+                info(`Tu mensaje es demasiado largo (${prompt.length} caracteres; el límite es ${MAX_AI_PROMPT_LENGTH}).\nDivide tu pregunta en mensajes más cortos.`));
             return;
         }
 
